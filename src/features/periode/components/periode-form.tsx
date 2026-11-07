@@ -52,7 +52,7 @@ function FieldUmum({
       />
       {identitasTerkunci ? <input type="hidden" name="semester" value={nilai?.semester} /> : null}
       <NumberField
-        label="Kuota siswa berprestasi"
+        label="Kuota siswa terpilih"
         name="kuota"
         defaultValue={nilai?.kuota ?? ""}
         hint="Jumlah siswa yang ditetapkan per kelompok. Kosongkan jika tidak ada."

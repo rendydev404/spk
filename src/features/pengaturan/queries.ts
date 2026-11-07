@@ -15,6 +15,14 @@ export const getPengaturan = cache(async () => {
       logoUrl: null,
       namaKepsek: "",
       nipKepsek: "",
+      jenjang: "SMA" as const,
+      npsn: "",
+      telepon: "",
+      email: "",
+      website: "",
+      jabatanPenandatangan: "Kepala Sekolah",
+      labelNomorInduk: "NIP",
+      judulSeleksi: "Siswa Berprestasi",
       updatedAt: new Date(),
     }
   );

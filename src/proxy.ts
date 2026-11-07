@@ -4,7 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 /** Pengecekan cepat: hanya keberadaan cookie sesi. Validasi sesi dan role dilakukan di server. */
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const publik = pathname === "/login" || pathname.startsWith("/api/auth");
+  const publik = pathname === "/login" || pathname === "/setup" || pathname.startsWith("/api/auth");
   if (!publik && !getSessionCookie(req)) {
     const url = new URL("/login", req.url);
     if (pathname !== "/") url.searchParams.set("ke", pathname);

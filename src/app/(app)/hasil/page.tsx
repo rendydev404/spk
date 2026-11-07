@@ -192,7 +192,7 @@ export default async function HasilPage({
                       </td>
                       <td>
                         {masuk ? (
-                          <Badge tone="success">{final ? "Siswa berprestasi" : "Calon (masuk kuota)"}</Badge>
+                          <Badge tone="success">{final ? "Terpilih" : "Calon (masuk kuota)"}</Badge>
                         ) : null}
                       </td>
                     </tr>

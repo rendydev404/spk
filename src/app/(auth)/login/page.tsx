@@ -1,13 +1,25 @@
+import { count } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { db } from "@/db";
+import { user } from "@/db/schema";
+import { getPengaturan } from "@/features/pengaturan/queries";
 import { getPengguna } from "@/lib/rbac";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Masuk" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ ke?: string }> }) {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ke?: string; setup?: string }>;
+}) {
   if (await getPengguna()) redirect("/dashboard");
-  const { ke } = await searchParams;
+  // Instalasi baru (belum ada pengguna sama sekali): arahkan ke setup awal.
+  const [jumlah] = await db.select({ n: count() }).from(user);
+  if ((jumlah?.n ?? 0) === 0) redirect("/setup");
+  const sekolah = await getPengaturan();
+  const { ke, setup } = await searchParams;
   // hanya path internal untuk mencegah open redirect
   const tujuan = ke?.startsWith("/") && !ke.startsWith("//") ? ke : "/dashboard";
   return (
@@ -26,11 +38,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" strokeLinecap="round" />
             </svg>
           </span>
-          SPK Siswa Berprestasi
+          {sekolah.namaSekolah}
         </div>
         <div className="max-w-md">
           <p className="text-[28px] font-semibold leading-tight tracking-tight">
-            Peringkat siswa yang bisa ditelusuri, dari nilai mentah sampai keputusan akhir.
+            Seleksi {sekolah.judulSeleksi.toLowerCase()} yang bisa ditelusuri, dari nilai mentah sampai
+            keputusan akhir.
           </p>
           <p className="mt-4 text-[15px] leading-relaxed opacity-80">
             Penilaian multikriteria dengan metode Simple Additive Weighting. Setiap langkah perhitungan
@@ -43,6 +56,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <div className="w-full max-w-sm">
           <h1 className="text-xl font-semibold tracking-tight">Masuk</h1>
           <p className="mt-1 text-[13.5px] text-muted">Gunakan akun yang dibuat oleh admin sekolah.</p>
+          {setup ? (
+            <p
+              role="status"
+              className="mt-4 rounded-md border border-success/30 bg-success-soft px-3 py-2.5 text-[13px]"
+            >
+              Setup selesai. Masuk dengan akun admin yang baru dibuat.
+            </p>
+          ) : null}
           <LoginForm tujuan={tujuan} />
         </div>
       </section>

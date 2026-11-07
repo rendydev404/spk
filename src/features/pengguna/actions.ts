@@ -1,7 +1,7 @@
 "use server";
 
 import { hashPassword } from "better-auth/crypto";
-import { and, count, eq, ne } from "drizzle-orm";
+import { and, count, eq, inArray, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
@@ -10,7 +10,9 @@ import { account, session, user } from "@/db/schema";
 import { GalatBisnis, type HasilAksi, jalankan } from "@/lib/aksi";
 import { catatAudit } from "@/lib/audit";
 import { auth } from "@/lib/auth";
+import { bacaXlsx, PESAN_FILE } from "@/lib/excel";
 import { requireRole, requireUser } from "@/lib/rbac";
+import { LABEL_ROLE } from "@/lib/status";
 
 const penggunaSchema = z.object({
   name: z.string().trim().min(2, "Nama minimal 2 karakter").max(100),
@@ -196,5 +198,115 @@ export async function ubahNamaSendiri(_: unknown, fd: FormData): Promise<HasilAk
     await db.update(user).set({ name }).where(eq(user.id, u.id));
     revalidatePath("/", "layout");
     return { ok: true, pesan: "Nama disimpan" };
+  });
+}
+
+export type AkunBaru = { nama: string; username: string; peran: string; password: string };
+
+const PERAN_EXCEL: Record<string, "ADMIN" | "WALI_KELAS" | "KEPSEK"> = {
+  admin: "ADMIN",
+  "wali kelas": "WALI_KELAS",
+  wali: "WALI_KELAS",
+  "kepala sekolah": "KEPSEK",
+  kepsek: "KEPSEK",
+  "kepala madrasah": "KEPSEK",
+};
+
+/** Impor banyak akun sekaligus. Semua baris harus valid; password sementara ditampilkan sekali. */
+export async function imporPengguna(_: unknown, fd: FormData): Promise<HasilAksi<AkunBaru[]>> {
+  return jalankan(async () => {
+    const u = await requireRole("ADMIN");
+    let baris: string[][];
+    try {
+      const r = await bacaXlsx(fd.get("file") as File | null, 4);
+      if (!/nama/i.test(r.header[0] ?? "")) throw new Error("FILE_FORMAT");
+      baris = r.baris;
+    } catch (e) {
+      throw new GalatBisnis(
+        PESAN_FILE[(e as Error).message] ?? "File tidak bisa dibaca. Pastikan memakai template.",
+      );
+    }
+    if (baris.length === 0) throw new GalatBisnis("File tidak berisi data pengguna");
+    if (baris.length > 500) throw new GalatBisnis("Maksimal 500 pengguna per impor");
+    const masalah: string[] = [];
+    const lihat = new Set<string>();
+    const data = baris.map(([name = "", username = "", peran = "", email = ""], i) => {
+      const no = i + 2;
+      const role = PERAN_EXCEL[peran.trim().toLowerCase()];
+      if (!role)
+        masalah.push(`Baris ${no}: peran "${peran}" tidak dikenal (Admin, Wali Kelas, Kepala Sekolah)`);
+      const r = penggunaSchema.safeParse({ name, username, email, role: role ?? "WALI_KELAS" });
+      if (!r.success) {
+        for (const iss of r.error.issues) masalah.push(`Baris ${no}: ${iss.message}`);
+        return null;
+      }
+      if (lihat.has(r.data.username)) masalah.push(`Baris ${no}: username "${r.data.username}" ganda`);
+      lihat.add(r.data.username);
+      return r.data;
+    });
+    const valid = data.filter((d): d is z.infer<typeof penggunaSchema> => d !== null);
+    if (valid.length) {
+      const ada = await db
+        .select({ username: user.username })
+        .from(user)
+        .where(
+          inArray(
+            user.username,
+            valid.map((v) => v.username),
+          ),
+        );
+      for (const a of ada) masalah.push(`Username "${a.username}" sudah dipakai`);
+    }
+    if (masalah.length)
+      throw new GalatBisnis(
+        "File berisi data yang tidak valid. Tidak ada yang disimpan.",
+        masalah.slice(0, 20),
+      );
+
+    const akun = await Promise.all(
+      valid.map(async (v) => {
+        const password = passwordSementara();
+        return { v, password, hash: await hashPassword(password), id: crypto.randomUUID() };
+      }),
+    );
+    await db.transaction(async (tx) => {
+      await tx.insert(user).values(
+        akun.map(({ v, id }) => ({
+          id,
+          name: v.name,
+          username: v.username,
+          displayUsername: v.username,
+          email: v.email ?? `${v.username}@spk.local`,
+          role: v.role,
+          wajibGantiPassword: true,
+        })),
+      );
+      await tx
+        .insert(account)
+        .values(
+          akun.map(({ id, hash }) => ({
+            id: crypto.randomUUID(),
+            accountId: id,
+            providerId: "credential",
+            userId: id,
+            password: hash,
+          })),
+        );
+      await catatAudit(
+        { userId: u.id, aksi: "PENGGUNA_IMPOR", entitas: "user", data: { jumlah: akun.length } },
+        tx,
+      );
+    });
+    revalidatePath("/pengguna");
+    return {
+      ok: true,
+      pesan: `${akun.length} akun dibuat`,
+      data: akun.map(({ v, password }) => ({
+        nama: v.name,
+        username: v.username,
+        peran: LABEL_ROLE[v.role],
+        password,
+      })),
+    };
   });
 }

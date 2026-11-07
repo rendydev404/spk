@@ -42,6 +42,7 @@ export const statusPerhitunganEnum = pgEnum("status_perhitungan", [
   "DITOLAK",
 ]);
 export const keputusanEnum = pgEnum("keputusan", ["DISETUJUI", "DITOLAK"]);
+export const jenjangEnum = pgEnum("jenjang", ["SD", "SMP", "SMA", "LAINNYA"]);
 
 const timestamps = {
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -324,6 +325,17 @@ export const pengaturanSekolah = pgTable(
     logoUrl: text(),
     namaKepsek: text().notNull().default(""),
     nipKepsek: text().notNull().default(""),
+    jenjang: jenjangEnum().notNull().default("SMA"),
+    npsn: text().notNull().default(""),
+    telepon: text().notNull().default(""),
+    email: text().notNull().default(""),
+    website: text().notNull().default(""),
+    /** Jabatan di tanda tangan laporan, misal "Kepala Sekolah" atau "Kepala Madrasah". */
+    jabatanPenandatangan: text().notNull().default("Kepala Sekolah"),
+    /** Jenis nomor induk penandatangan: NIP, NIY, NUPTK, dst. */
+    labelNomorInduk: text().notNull().default("NIP"),
+    /** Nama seleksi di judul laporan, misal "Siswa Berprestasi" atau "Penerima Beasiswa". */
+    judulSeleksi: text().notNull().default("Siswa Berprestasi"),
     updatedAt: timestamp({ withTimezone: true })
       .notNull()
       .defaultNow()

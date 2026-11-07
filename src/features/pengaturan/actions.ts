@@ -13,10 +13,22 @@ const schema = z.object({
   alamat: z.string().trim().max(200),
   kota: z.string().trim().max(60),
   namaKepsek: z.string().trim().max(100),
-  nipKepsek: z
+  nipKepsek: z.string().trim().max(40),
+  jenjang: z.enum(["SD", "SMP", "SMA", "LAINNYA"]),
+  npsn: z
     .string()
     .trim()
-    .regex(/^(\d{18})?$/, "NIP 18 digit atau kosongkan"),
+    .regex(/^(\d{8})?$/, "NPSN 8 digit atau kosongkan"),
+  telepon: z.string().trim().max(40),
+  email: z
+    .string()
+    .trim()
+    .max(100)
+    .refine((v) => v === "" || z.string().email().safeParse(v).success, "Email tidak valid"),
+  website: z.string().trim().max(100),
+  jabatanPenandatangan: z.string().trim().min(3, "Jabatan wajib diisi").max(60),
+  labelNomorInduk: z.string().trim().min(2, "Wajib diisi").max(20),
+  judulSeleksi: z.string().trim().min(3, "Judul seleksi wajib diisi").max(80),
   hapusLogo: z.string().optional(),
 });
 

@@ -4,10 +4,13 @@ import Link from "next/link";
 import { TanpaPeriode } from "@/components/layout/tanpa-periode";
 import { Badge, EmptyState, PageHeader } from "@/components/ui/misc";
 import { HapusKelas } from "@/features/kelas/components/hapus-kelas";
+import { ImporKelas } from "@/features/kelas/components/impor-kelas";
 import { KelasDialog } from "@/features/kelas/components/kelas-dialog";
 import { daftarKelas } from "@/features/kelas/queries";
+import { getPengaturan } from "@/features/pengaturan/queries";
 import { opsiWaliKelas } from "@/features/pengguna/queries";
 import { getPeriodeKerja } from "@/features/periode/kerja";
+import { daftarTingkat } from "@/lib/jenjang";
 import { requireUser } from "@/lib/rbac";
 
 export const metadata: Metadata = { title: "Kelas" };
@@ -17,10 +20,12 @@ export default async function KelasPage() {
   const { kerja } = await getPeriodeKerja();
   if (!kerja) return <TanpaPeriode />;
   const admin = u.role === "ADMIN";
-  const [data, wali] = await Promise.all([
+  const [data, wali, sekolah] = await Promise.all([
     daftarKelas(kerja.id, u),
     admin ? opsiWaliKelas() : Promise.resolve([]),
+    getPengaturan(),
   ]);
+  const tingkat = daftarTingkat(sekolah.jenjang);
   const bisaTambah = admin && kerja.status === "DRAFT";
   const bisaUbahWali = admin && ["DRAFT", "PENILAIAN", "PERHITUNGAN"].includes(kerja.status);
   return (
@@ -28,7 +33,14 @@ export default async function KelasPage() {
       <PageHeader
         title="Kelas"
         description={`Rombongan belajar periode ${kerja.nama}. Setiap kelas wajib punya wali kelas sebelum penilaian dibuka.`}
-        actions={bisaTambah ? <KelasDialog periodeId={kerja.id} wali={wali} /> : null}
+        actions={
+          bisaTambah ? (
+            <>
+              <ImporKelas />
+              <KelasDialog periodeId={kerja.id} wali={wali} tingkat={tingkat} />
+            </>
+          ) : null
+        }
       />
       <div className="panel overflow-x-auto">
         {data.length === 0 ? (
@@ -72,6 +84,7 @@ export default async function KelasPage() {
                           <KelasDialog
                             periodeId={kerja.id}
                             wali={wali}
+                            tingkat={tingkat}
                             hanyaWali={kerja.status !== "DRAFT"}
                             nilai={{ id: k.id, nama: k.nama, tingkat: k.tingkat, waliKelasId: k.waliKelasId }}
                           />

@@ -94,7 +94,7 @@ test("alur lengkap seleksi", async ({ browser }) => {
   await page.getByRole("dialog").getByRole("button", { name: "Setujui" }).click();
   await expect(page.getByText("Hasil disahkan. Periode menjadi Final.")).toBeVisible();
   await page.goto("/hasil");
-  await expect(page.getByText("Siswa berprestasi").first()).toBeVisible();
+  await expect(page.getByText("Terpilih", { exact: true }).first()).toBeVisible();
   await page.goto("/laporan");
   await page.getByRole("link", { name: "Pratinjau" }).first().click();
   await expect(page.getByText("Disahkan", { exact: true }).first()).toBeVisible();

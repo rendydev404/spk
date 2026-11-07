@@ -1,14 +1,18 @@
 "use server";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/db";
 import { kelas, kelasSiswa, siswa, user } from "@/db/schema";
 import { GalatBisnis, type HasilAksi, jalankan } from "@/lib/aksi";
 import { catatAudit } from "@/lib/audit";
+import { bacaXlsx, PESAN_FILE } from "@/lib/excel";
+import { daftarTingkat } from "@/lib/jenjang";
 import { requireRole } from "@/lib/rbac";
+import { getPengaturan } from "../pengaturan/queries";
 import { kunciPeriode } from "../periode/guard";
+import { getPeriodeKerja } from "../periode/kerja";
 
 const uuid = z.string().uuid();
 const kelasSchema = z.object({
@@ -186,5 +190,80 @@ export async function pindahkanAnggota(
     });
     revalidatePath(`/kelas/${kid}`);
     return { ok: true, pesan: "Siswa dipindahkan" };
+  });
+}
+
+/** Impor kelas ke periode kerja (Draf). Semua baris harus valid (all-or-nothing). */
+export async function imporKelas(_: unknown, fd: FormData): Promise<HasilAksi> {
+  return jalankan(async () => {
+    const u = await requireRole("ADMIN");
+    const { kerja } = await getPeriodeKerja();
+    if (!kerja) throw new GalatBisnis("Belum ada periode");
+    let baris: string[][];
+    try {
+      const r = await bacaXlsx(fd.get("file") as File | null, 3);
+      if (!/kelas/i.test(r.header[0] ?? "")) throw new Error("FILE_FORMAT");
+      baris = r.baris;
+    } catch (e) {
+      throw new GalatBisnis(
+        PESAN_FILE[(e as Error).message] ?? "File tidak bisa dibaca. Pastikan memakai template.",
+      );
+    }
+    if (baris.length === 0) throw new GalatBisnis("File tidak berisi data kelas");
+    if (baris.length > 300) throw new GalatBisnis("Maksimal 300 kelas per impor");
+    const sekolah = await getPengaturan();
+    const tingkatSah = new Set(daftarTingkat(sekolah.jenjang));
+    const wali = await db
+      .select({ id: user.id, username: user.username })
+      .from(user)
+      .where(and(eq(user.role, "WALI_KELAS"), eq(user.aktif, true)));
+    const waliByUsername = new Map(wali.map((w) => [w.username.toLowerCase(), w.id]));
+    const masalah: string[] = [];
+    const lihat = new Set<string>();
+    const data = baris.map(([nama = "", tingkat = "", username = ""], i) => {
+      const no = i + 2;
+      const n = nama.trim();
+      const t = Number(tingkat);
+      if (!n || n.length > 40) masalah.push(`Baris ${no}: nama kelas wajib, maksimal 40 karakter`);
+      if (lihat.has(n.toLowerCase())) masalah.push(`Baris ${no}: kelas "${n}" ganda`);
+      lihat.add(n.toLowerCase());
+      if (!tingkatSah.has(t))
+        masalah.push(
+          `Baris ${no}: tingkat "${tingkat}" tidak sesuai jenjang (${[...tingkatSah].join(", ")})`,
+        );
+      let waliKelasId: string | null = null;
+      if (username.trim()) {
+        waliKelasId = waliByUsername.get(username.trim().toLowerCase()) ?? null;
+        if (!waliKelasId) masalah.push(`Baris ${no}: wali "${username}" bukan akun wali kelas aktif`);
+      }
+      return { nama: n, tingkat: t, waliKelasId };
+    });
+    if (masalah.length)
+      throw new GalatBisnis(
+        "File berisi data yang tidak valid. Tidak ada yang disimpan.",
+        masalah.slice(0, 20),
+      );
+    await db.transaction(async (tx) => {
+      await kunciPeriode(tx, kerja.id, ["DRAFT"]);
+      await tx
+        .insert(kelas)
+        .values(data.map((d) => ({ ...d, periodeId: kerja.id })))
+        .onConflictDoUpdate({
+          target: [kelas.periodeId, kelas.nama],
+          set: { tingkat: sql`excluded.tingkat`, waliKelasId: sql`excluded.wali_kelas_id` },
+        });
+      await catatAudit(
+        {
+          userId: u.id,
+          aksi: "KELAS_IMPOR",
+          entitas: "periode",
+          entitasId: kerja.id,
+          data: { jumlah: data.length },
+        },
+        tx,
+      );
+    });
+    revalidatePath("/kelas");
+    return { ok: true, pesan: `${data.length} kelas diimpor` };
   });
 }

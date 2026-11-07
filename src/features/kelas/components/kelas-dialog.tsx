@@ -14,18 +14,19 @@ import { simpanKelas } from "../actions";
 type Wali = { id: string; name: string; username: string };
 type Nilai = { id: string; nama: string; tingkat: number; waliKelasId: string | null };
 
-const TINGKAT = Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1), label: `Tingkat ${i + 1}` }));
-
 export function KelasDialog({
   periodeId,
   wali,
   nilai,
   hanyaWali,
+  tingkat,
 }: {
   periodeId: string;
   wali: Wali[];
   nilai?: Nilai;
   hanyaWali?: boolean;
+  /** Pilihan tingkat sesuai jenjang sekolah. */
+  tingkat: number[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -69,7 +70,7 @@ export function KelasDialog({
               <Select
                 label="Tingkat"
                 name="tingkat"
-                options={TINGKAT}
+                options={tingkat.map((t) => ({ value: String(t), label: `Tingkat ${t}` }))}
                 defaultValue={nilai ? String(nilai.tingkat) : undefined}
                 disabled={hanyaWali}
                 error={galat.tingkat}

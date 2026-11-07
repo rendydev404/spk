@@ -45,7 +45,7 @@ export function DetailSiswa({ r, kriteria }: { r: R; kriteria: K[] }) {
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <p className="text-2xl font-semibold tabular">{f4.format(v)}</p>
           <span className="text-[13px] text-muted">nilai preferensi V</span>
-          {r.terpilih ? <Badge tone="success">Siswa berprestasi</Badge> : null}
+          {r.terpilih ? <Badge tone="success">Terpilih</Badge> : null}
         </div>
         <div className="overflow-x-auto rounded-md border border-border">
           <table className="tabel">

@@ -2,8 +2,10 @@ import ExcelJS from "exceljs";
 import { z } from "zod";
 import { getKelas } from "@/features/kelas/queries";
 import { kriteriaLengkap } from "@/features/kriteria/queries";
+import { getPengaturan } from "@/features/pengaturan/queries";
 import { dataGrid } from "@/features/penilaian/queries";
 import { gayaHeader, keResponse } from "@/lib/excel";
+import { daftarTingkat } from "@/lib/jenjang";
 import { AksesDitolak, getPengguna, requireKelasAccess } from "@/lib/rbac";
 
 export async function GET(req: Request, { params }: { params: Promise<{ jenis: string }> }) {
@@ -46,6 +48,74 @@ export async function GET(req: Request, { params }: { params: Promise<{ jenis: s
       info.addRow([t]);
     }
     return keResponse(wb, "template-siswa.xlsx");
+  }
+
+  if (jenis === "kelas") {
+    if (u.role !== "ADMIN") return new Response("Akses ditolak", { status: 403 });
+    const sekolah = await getPengaturan();
+    const tingkat = daftarTingkat(sekolah.jenjang);
+    const ws = wb.addWorksheet("Kelas");
+    ws.columns = [
+      { header: "Nama Kelas", width: 18 },
+      { header: "Tingkat", width: 10 },
+      { header: "Username Wali Kelas", width: 24 },
+    ];
+    gayaHeader(ws.getRow(1));
+    ws.addRow([`Contoh ${tingkat[0]}A`, tingkat[0], "username.wali"]).font = {
+      italic: true,
+      color: { argb: "FF888888" },
+    };
+    for (let r = 2; r <= 300; r++) {
+      ws.getCell(`B${r}`).dataValidation = {
+        type: "list",
+        allowBlank: true,
+        formulae: [`"${tingkat.join(",")}"`],
+      };
+    }
+    const info = wb.addWorksheet("Petunjuk");
+    info.getColumn(1).width = 100;
+    for (const t of [
+      "Hapus baris contoh sebelum mengimpor.",
+      `Tingkat sesuai jenjang sekolah: ${tingkat.join(", ")}.`,
+      "Username wali kelas harus sudah terdaftar sebagai akun Wali Kelas. Boleh dikosongkan dulu.",
+      "Kelas dengan nama yang sudah ada di periode kerja akan diperbarui.",
+    ]) {
+      info.addRow([t]);
+    }
+    return keResponse(wb, "template-kelas.xlsx");
+  }
+
+  if (jenis === "pengguna") {
+    if (u.role !== "ADMIN") return new Response("Akses ditolak", { status: 403 });
+    const ws = wb.addWorksheet("Pengguna");
+    ws.columns = [
+      { header: "Nama Lengkap", width: 32 },
+      { header: "Username", width: 20 },
+      { header: "Peran", width: 18 },
+      { header: "Email (opsional)", width: 28 },
+    ];
+    gayaHeader(ws.getRow(1));
+    ws.addRow(["Contoh Nama Guru, S.Pd.", "contoh.guru", "Wali Kelas", ""]).font = {
+      italic: true,
+      color: { argb: "FF888888" },
+    };
+    for (let r = 2; r <= 500; r++) {
+      ws.getCell(`C${r}`).dataValidation = {
+        type: "list",
+        allowBlank: false,
+        formulae: ['"Wali Kelas,Kepala Sekolah,Admin"'],
+      };
+    }
+    const info = wb.addWorksheet("Petunjuk");
+    info.getColumn(1).width = 100;
+    for (const t of [
+      "Hapus baris contoh sebelum mengimpor.",
+      "Username: huruf kecil, angka, titik, atau garis bawah; minimal 3 karakter; harus unik.",
+      "Password sementara dibuat otomatis dan ditampilkan sekali setelah impor.",
+    ]) {
+      info.addRow([t]);
+    }
+    return keResponse(wb, "template-pengguna.xlsx");
   }
 
   if (jenis === "nilai") {

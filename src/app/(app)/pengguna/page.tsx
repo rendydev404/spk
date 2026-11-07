@@ -2,6 +2,7 @@ import { UserCog } from "lucide-react";
 import type { Metadata } from "next";
 import { FilterSelect, SearchBox } from "@/components/ui/filter";
 import { Badge, EmptyState, PageHeader } from "@/components/ui/misc";
+import { ImporPengguna } from "@/features/pengguna/components/impor-pengguna";
 import { PenggunaAksi } from "@/features/pengguna/components/pengguna-aksi";
 import { PenggunaDialog } from "@/features/pengguna/components/pengguna-dialog";
 import { daftarPengguna } from "@/features/pengguna/queries";
@@ -24,7 +25,12 @@ export default async function PenggunaPage({
       <PageHeader
         title="Pengguna"
         description="Akun dibuat oleh admin; tidak ada pendaftaran mandiri."
-        actions={<PenggunaDialog />}
+        actions={
+          <>
+            <ImporPengguna />
+            <PenggunaDialog />
+          </>
+        }
       />
       <div className="panel">
         <div className="flex flex-wrap gap-2 border-b border-border p-3">

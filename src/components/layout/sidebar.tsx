@@ -69,6 +69,7 @@ interface Props {
   periode: { id: string; nama: string; status: StatusPeriode }[];
   periodeKerja: { id: string; nama: string; status: StatusPeriode } | null;
   namaSekolah: string;
+  judulSeleksi: string;
 }
 
 function Isi({
@@ -76,6 +77,7 @@ function Isi({
   periode,
   periodeKerja,
   namaSekolah,
+  judulSeleksi,
   onNavigate,
 }: Props & { onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -100,8 +102,10 @@ function Isi({
           </svg>
         </span>
         <div className="min-w-0">
-          <p className="truncate text-[13.5px] font-semibold leading-tight">SPK Siswa Berprestasi</p>
-          <p className="truncate text-[11.5px] text-muted">{namaSekolah}</p>
+          <p className="truncate text-[13.5px] font-semibold leading-tight" title={namaSekolah}>
+            {namaSekolah}
+          </p>
+          <p className="truncate text-[11.5px] text-muted">SPK {judulSeleksi}</p>
         </div>
       </div>
 
@@ -233,7 +237,7 @@ export function Sidebar(props: Props) {
         >
           <Menu className="size-5" aria-hidden />
         </button>
-        <span className="text-[13.5px] font-semibold">SPK Siswa Berprestasi</span>
+        <span className="truncate text-[13.5px] font-semibold">{props.namaSekolah}</span>
       </div>
       {buka ? (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">

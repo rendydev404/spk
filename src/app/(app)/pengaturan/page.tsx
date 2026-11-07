@@ -13,7 +13,7 @@ export default async function PengaturanPage() {
     <>
       <PageHeader
         title="Pengaturan sekolah"
-        description="Identitas sekolah untuk kop dan tanda tangan laporan hasil seleksi."
+        description="Profil sekolah, nama seleksi, dan penandatangan laporan. Semua bisa disesuaikan dengan kebutuhan sekolah."
       />
       <div className="panel max-w-3xl p-5">
         <PengaturanForm
@@ -24,6 +24,14 @@ export default async function PengaturanPage() {
             namaKepsek: p.namaKepsek,
             nipKepsek: p.nipKepsek,
             logoUrl: p.logoUrl,
+            jenjang: p.jenjang,
+            npsn: p.npsn,
+            telepon: p.telepon,
+            email: p.email,
+            website: p.website,
+            jabatanPenandatangan: p.jabatanPenandatangan,
+            labelNomorInduk: p.labelNomorInduk,
+            judulSeleksi: p.judulSeleksi,
           }}
         />
       </div>

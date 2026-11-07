@@ -5,8 +5,9 @@ import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "SPK Siswa Berprestasi", template: "%s | SPK Siswa Berprestasi" },
-  description: "Sistem pendukung keputusan pemilihan siswa berprestasi dengan metode SAW",
+  title: { default: "SPK Seleksi Siswa", template: "%s | SPK Seleksi Siswa" },
+  description:
+    "Sistem pendukung keputusan seleksi siswa dengan metode SAW, dapat disesuaikan untuk sekolah mana pun",
 };
 
 export const viewport: Viewport = {

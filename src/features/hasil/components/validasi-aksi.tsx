@@ -28,7 +28,7 @@ export function ValidasiAksi({ runId, kuota }: { runId: string; kuota: number | 
         title={mode === "DISETUJUI" ? "Setujui dan sahkan hasil?" : "Tolak hasil perhitungan?"}
         description={
           mode === "DISETUJUI"
-            ? `Periode menjadi Final dan semua data terkunci.${kuota ? ` ${kuota} siswa teratas tiap kelompok ditetapkan sebagai siswa berprestasi.` : ""}`
+            ? `Periode menjadi Final dan semua data terkunci.${kuota ? ` ${kuota} siswa teratas tiap kelompok ditetapkan sebagai siswa terpilih.` : ""}`
             : "Periode dikembalikan ke tahap Perhitungan agar admin bisa memperbaiki dan menghitung ulang."
         }
         confirmLabel={mode === "DISETUJUI" ? "Setujui" : "Tolak"}

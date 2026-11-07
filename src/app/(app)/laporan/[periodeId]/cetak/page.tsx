@@ -71,16 +71,24 @@ export default async function CetakPage({
           ) : null}
           <div className="flex-1 text-center">
             <p className="text-[15pt] font-bold uppercase tracking-wide">{sekolah.namaSekolah}</p>
+            {sekolah.npsn ? <p className="text-[10pt]">NPSN {sekolah.npsn}</p> : null}
             <p className="text-[10.5pt]">
               {sekolah.alamat}
               {sekolah.kota ? `, ${sekolah.kota}` : ""}
             </p>
+            {sekolah.telepon || sekolah.email || sekolah.website ? (
+              <p className="text-[9.5pt]">
+                {[sekolah.telepon && `Telp. ${sekolah.telepon}`, sekolah.email, sekolah.website]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            ) : null}
           </div>
           {sekolah.logoUrl ? <div className="size-[22mm]" /> : null}
         </header>
 
         <div className="mt-5 text-center">
-          <h1 className="text-[13pt] font-bold uppercase">Hasil Seleksi Siswa Berprestasi</h1>
+          <h1 className="text-[13pt] font-bold uppercase">Hasil Seleksi {sekolah.judulSeleksi}</h1>
           <p>
             Periode {periode.nama} · Metode Simple Additive Weighting (SAW) · {LABEL_CAKUPAN[run.cakupan]}
           </p>
@@ -141,7 +149,7 @@ export default async function CetakPage({
                       <td>{r.kelasNama}</td>
                       <td className="r">{fmt4(r.v)}</td>
                       <td className="r">{r.peringkat}</td>
-                      <td>{r.terpilih ? (disahkan ? "Siswa berprestasi" : "Calon") : ""}</td>
+                      <td>{r.terpilih ? (disahkan ? "Terpilih" : "Calon") : ""}</td>
                     </tr>
                   ))}
               </tbody>
@@ -202,12 +210,14 @@ export default async function CetakPage({
             <p>
               {sekolah.kota || "........"}, {tanggal}
             </p>
-            <p>Kepala Sekolah</p>
+            <p>{sekolah.jabatanPenandatangan}</p>
             <div className="h-[22mm]" />
             <p className="font-semibold underline">
               {sekolah.namaKepsek || "...................................."}
             </p>
-            <p>NIP {sekolah.nipKepsek || "..................."}</p>
+            <p>
+              {sekolah.labelNomorInduk} {sekolah.nipKepsek || "..................."}
+            </p>
           </div>
         </footer>
       </article>
