@@ -8,16 +8,34 @@ import { ConfirmDialog } from "@/components/ui/dialog";
 import { useAksi } from "@/components/ui/use-aksi";
 import { geserKriteria, hapusKriteria } from "../actions";
 
-export function KriteriaBarisAksi({ id, kode, pertama, terakhir }: { id: string; kode: string; pertama: boolean; terakhir: boolean }) {
+export function KriteriaBarisAksi({
+  id,
+  kode,
+  pertama,
+  terakhir,
+}: {
+  id: string;
+  kode: string;
+  pertama: boolean;
+  terakhir: boolean;
+}) {
   const router = useRouter();
   const { jalan, pending } = useAksi();
   const [hapus, setHapus] = useState(false);
   return (
     <>
-      <IconButton label={`Naikkan ${kode}`} disabled={pertama || pending} onClick={() => jalan(() => geserKriteria(id, "naik"), { onOk: router.refresh, diam: true })}>
+      <IconButton
+        label={`Naikkan ${kode}`}
+        disabled={pertama || pending}
+        onClick={() => jalan(() => geserKriteria(id, "naik"), { onOk: router.refresh, diam: true })}
+      >
         <ArrowUp className="size-4" aria-hidden />
       </IconButton>
-      <IconButton label={`Turunkan ${kode}`} disabled={terakhir || pending} onClick={() => jalan(() => geserKriteria(id, "turun"), { onOk: router.refresh, diam: true })}>
+      <IconButton
+        label={`Turunkan ${kode}`}
+        disabled={terakhir || pending}
+        onClick={() => jalan(() => geserKriteria(id, "turun"), { onOk: router.refresh, diam: true })}
+      >
         <ArrowDown className="size-4" aria-hidden />
       </IconButton>
       <IconButton label={`Hapus ${kode}`} onClick={() => setHapus(true)} className="hover:text-danger">

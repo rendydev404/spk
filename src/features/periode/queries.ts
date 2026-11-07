@@ -1,7 +1,7 @@
 import "server-only";
 import { count, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { alternatif, kelas, kriteria, penilaian, periode, perhitungan } from "@/db/schema";
+import { alternatif, kelas, kriteria, penilaian, perhitungan, periode } from "@/db/schema";
 
 export async function daftarPeriode() {
   // Satu query dengan subquery agregat (tanpa N+1).

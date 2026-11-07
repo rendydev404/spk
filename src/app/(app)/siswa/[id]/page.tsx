@@ -1,15 +1,15 @@
+import { and, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { Badge, EmptyState, PageHeader } from "@/components/ui/misc";
+import { db } from "@/db";
+import { kelasSiswa } from "@/db/schema";
 import { daftarKelas } from "@/features/kelas/queries";
 import { getPeriodeKerja } from "@/features/periode/kerja";
 import { getSiswa, riwayatSiswa } from "@/features/siswa/queries";
-import { db } from "@/db";
-import { kelasSiswa } from "@/db/schema";
 import { fmt4, fmtTanggalPanjang } from "@/lib/format";
 import { requireUser } from "@/lib/rbac";
-import { and, eq, inArray } from "drizzle-orm";
 
 export const metadata: Metadata = { title: "Detail siswa" };
 
@@ -25,7 +25,10 @@ export default async function SiswaDetail({ params }: { params: Promise<{ id: st
     const kelasSaya = kerja ? await daftarKelas(kerja.id, u) : [];
     const ids = kelasSaya.map((k) => k.id);
     const [ok] = ids.length
-      ? await db.select({ x: kelasSiswa.siswaId }).from(kelasSiswa).where(and(eq(kelasSiswa.siswaId, id), inArray(kelasSiswa.kelasId, ids)))
+      ? await db
+          .select({ x: kelasSiswa.siswaId })
+          .from(kelasSiswa)
+          .where(and(eq(kelasSiswa.siswaId, id), inArray(kelasSiswa.kelasId, ids)))
       : [];
     if (!ok) notFound();
   }
@@ -48,7 +51,10 @@ export default async function SiswaDetail({ params }: { params: Promise<{ id: st
           {kelasRiwayat.length ? (
             <ul className="text-[13.5px]">
               {kelasRiwayat.map((k) => (
-                <li key={k.periodeId} className="flex justify-between border-b border-border py-1.5 last:border-0">
+                <li
+                  key={k.periodeId}
+                  className="flex justify-between border-b border-border py-1.5 last:border-0"
+                >
                   <span className="text-muted">{k.periode}</span>
                   <span>{k.kelas}</span>
                 </li>
@@ -81,7 +87,13 @@ export default async function SiswaDetail({ params }: { params: Promise<{ id: st
                       <td>{h.kelompok === "SEKOLAH" ? "Sekolah" : h.kelompok}</td>
                       <td className="num">{fmt4(h.nilai)}</td>
                       <td className="num">{h.peringkat}</td>
-                      <td>{h.terpilih ? <Badge tone="success">Terpilih</Badge> : <span className="text-muted">-</span>}</td>
+                      <td>
+                        {h.terpilih ? (
+                          <Badge tone="success">Terpilih</Badge>
+                        ) : (
+                          <span className="text-muted">-</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

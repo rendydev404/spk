@@ -11,7 +11,15 @@ const nada: Record<Nada, string> = {
   info: "bg-info-soft text-info border-transparent",
 };
 
-export function Badge({ children, tone = "netral", className }: { children: ReactNode; tone?: Nada; className?: string }) {
+export function Badge({
+  children,
+  tone = "netral",
+  className,
+}: {
+  children: ReactNode;
+  tone?: Nada;
+  className?: string;
+}) {
   return (
     <span
       className={cn(
@@ -103,11 +111,18 @@ export function Alert({
     success: "border-success/30 bg-success-soft text-fg",
   }[tone];
   return (
-    <div role={tone === "danger" ? "alert" : "status"} className={cn("flex gap-2.5 rounded-md border px-3.5 py-3 text-[13px]", c)}>
+    <div
+      role={tone === "danger" ? "alert" : "status"}
+      className={cn("flex gap-2.5 rounded-md border px-3.5 py-3 text-[13px]", c)}
+    >
       {icon ? <div className="mt-0.5 shrink-0 [&_svg]:size-4">{icon}</div> : null}
       <div className="min-w-0">
         {title ? <p className="font-medium">{title}</p> : null}
-        {children ? <div className={cn(title && "mt-0.5", "text-[13px] [&_ul]:mt-1 [&_ul]:list-disc [&_ul]:pl-4")}>{children}</div> : null}
+        {children ? (
+          <div className={cn(title && "mt-0.5", "text-[13px] [&_ul]:mt-1 [&_ul]:list-disc [&_ul]:pl-4")}>
+            {children}
+          </div>
+        ) : null}
       </div>
     </div>
   );

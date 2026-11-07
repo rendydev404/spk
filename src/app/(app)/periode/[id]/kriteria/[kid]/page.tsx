@@ -27,13 +27,17 @@ export default async function SubKriteriaPage({ params }: { params: Promise<{ id
             <Link href={`/periode/${id}/kriteria`} className="text-accent hover:underline">
               Kriteria periode {p.nama}
             </Link>
-            <Badge tone={k.jenis === "BENEFIT" ? "info" : "warning"}>{k.jenis === "BENEFIT" ? "Benefit" : "Cost"}</Badge>
+            <Badge tone={k.jenis === "BENEFIT" ? "info" : "warning"}>
+              {k.jenis === "BENEFIT" ? "Benefit" : "Cost"}
+            </Badge>
             <Badge>{LABEL_TIPE[k.tipeInput]}</Badge>
           </span>
         }
       />
       {k.tipeInput === "ANGKA" ? (
-        <Alert tone="info">Kriteria bertipe Angka tidak memakai sub-kriteria. Nilai yang diinput langsung dipakai.</Alert>
+        <Alert tone="info">
+          Kriteria bertipe Angka tidak memakai sub-kriteria. Nilai yang diinput langsung dipakai.
+        </Alert>
       ) : (
         <>
           <p className="mb-4 max-w-3xl text-[13.5px] text-muted">
@@ -46,7 +50,13 @@ export default async function SubKriteriaPage({ params }: { params: Promise<{ id
             tipe={k.tipeInput}
             jenis={k.jenis}
             bisaUbah={bisaUbah}
-            awal={k.sub.map((s) => ({ id: s.id, label: s.label, nilai: s.nilai, batasBawah: s.batasBawah, batasAtas: s.batasAtas }))}
+            awal={k.sub.map((s) => ({
+              id: s.id,
+              label: s.label,
+              nilai: s.nilai,
+              batasBawah: s.batasBawah,
+              batasAtas: s.batasAtas,
+            }))}
           />
         </>
       )}

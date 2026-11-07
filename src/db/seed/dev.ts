@@ -6,8 +6,8 @@ import { hashPassword } from "better-auth/crypto";
 import { sql as dsql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { type KriteriaKonversi, konversi } from "../../lib/konversi.ts";
 import { hitungSaw } from "../../lib/saw/engine.ts";
-import { konversi, type KriteriaKonversi } from "../../lib/konversi.ts";
 import * as s from "../schema/index.ts";
 import { KRITERIA_DEFAULT } from "./default-kriteria.ts";
 
@@ -64,10 +64,19 @@ const KELAS: { nama: string; tingkat: number; wali: string; siswa: [string, "L" 
   },
 ];
 
-async function buatUser(username: string, name: string, role: "ADMIN" | "WALI_KELAS" | "KEPSEK", hash: string) {
+async function buatUser(
+  username: string,
+  name: string,
+  role: "ADMIN" | "WALI_KELAS" | "KEPSEK",
+  hash: string,
+) {
   const id = crypto.randomUUID();
-  await db.insert(s.user).values({ id, name, username, displayUsername: username, email: `${username}@spk.local`, role });
-  await db.insert(s.account).values({ id: crypto.randomUUID(), accountId: id, providerId: "credential", userId: id, password: hash });
+  await db
+    .insert(s.user)
+    .values({ id, name, username, displayUsername: username, email: `${username}@spk.local`, role });
+  await db
+    .insert(s.account)
+    .values({ id: crypto.randomUUID(), accountId: id, providerId: "credential", userId: id, password: hash });
   return id;
 }
 
@@ -177,7 +186,13 @@ async function main() {
   for (const pd of periodeDef) {
     const [p] = await db
       .insert(s.periode)
-      .values({ nama: pd.nama, tahunAjaran: pd.tahunAjaran, semester: pd.semester, kuota: 3, status: "DRAFT" })
+      .values({
+        nama: pd.nama,
+        tahunAjaran: pd.tahunAjaran,
+        semester: pd.semester,
+        kuota: 3,
+        status: "DRAFT",
+      })
       .returning({ id: s.periode.id });
     const periodeId = p!.id;
     const kriteria = await buatKriteria(periodeId);
@@ -197,9 +212,11 @@ async function main() {
       }
     }
     anggota.sort((a, b) => a.kelas.localeCompare(b.kelas, "id") || a.nama.localeCompare(b.nama, "id"));
-    await db.insert(s.alternatif).values(
-      anggota.map((a, i) => ({ periodeId, siswaId: a.siswaId, kode: `A${i + 1}`, ditambahkanOleh: admin })),
-    );
+    await db
+      .insert(s.alternatif)
+      .values(
+        anggota.map((a, i) => ({ periodeId, siswaId: a.siswaId, kode: `A${i + 1}`, ditambahkanOleh: admin })),
+      );
 
     const nilaiX = new Map<string, Record<string, number>>();
     const rows: (typeof s.penilaian.$inferInsert)[] = [];
@@ -286,7 +303,9 @@ async function main() {
         terpilih: h.peringkat <= 3,
       })),
     );
-    await db.insert(s.validasi).values({ perhitunganId: run!.id, kepsekId: kepsek, keputusan: "DISETUJUI", catatan: "Disetujui." });
+    await db
+      .insert(s.validasi)
+      .values({ perhitunganId: run!.id, kepsekId: kepsek, keputusan: "DISETUJUI", catatan: "Disetujui." });
     await db.update(s.periode).set({ status: "FINAL" }).where(dsql`${s.periode.id} = ${periodeId}`);
   }
 

@@ -3,7 +3,9 @@
 import { type ReactNode, useActionState, useEffect, useRef } from "react";
 import { useToast } from "./toast";
 
-type Hasil = { ok: true; pesan?: string } | { ok: false; pesan: string; galat?: Record<string, string>; masalah?: string[] };
+type Hasil =
+  | { ok: true; pesan?: string }
+  | { ok: false; pesan: string; galat?: Record<string, string>; masalah?: string[] };
 
 /**
  * Form yang memanggil server action (progressive enhancement), menampilkan notifikasi,

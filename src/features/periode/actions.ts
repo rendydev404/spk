@@ -5,8 +5,17 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/db";
+import {
+  alternatif,
+  hasil,
+  kelas,
+  kriteria,
+  penilaian,
+  perhitungan,
+  periode,
+  subKriteria,
+} from "@/db/schema";
 import { KRITERIA_DEFAULT } from "@/db/seed/default-kriteria";
-import { alternatif, hasil, kelas, kriteria, penilaian, periode, perhitungan, subKriteria } from "@/db/schema";
 import { GalatBisnis, type HasilAksi, jalankan } from "@/lib/aksi";
 import { catatAudit } from "@/lib/audit";
 import { requireRole } from "@/lib/rbac";
@@ -25,7 +34,13 @@ export async function buatPeriode(_: unknown, fd: FormData): Promise<HasilAksi> 
     await db.transaction(async (tx) => {
       const [p] = await tx
         .insert(periode)
-        .values({ nama, tahunAjaran: d.tahunAjaran, semester: d.semester, kuota: d.kuota, cakupanDefault: d.cakupanDefault })
+        .values({
+          nama,
+          tahunAjaran: d.tahunAjaran,
+          semester: d.semester,
+          kuota: d.kuota,
+          cakupanDefault: d.cakupanDefault,
+        })
         .returning({ id: periode.id });
       const pid = p!.id;
       idBaru = pid;
@@ -92,7 +107,16 @@ export async function buatPeriode(_: unknown, fd: FormData): Promise<HasilAksi> 
           }
         }
       }
-      await catatAudit({ userId: u.id, aksi: "PERIODE_BUAT", entitas: "periode", entitasId: pid, data: { nama, sumber: d.sumber } }, tx);
+      await catatAudit(
+        {
+          userId: u.id,
+          aksi: "PERIODE_BUAT",
+          entitas: "periode",
+          entitasId: pid,
+          data: { nama, sumber: d.sumber },
+        },
+        tx,
+      );
     });
     revalidatePath("/", "layout");
     return { ok: true, pesan: `Periode ${nama} dibuat` };
@@ -109,13 +133,23 @@ export async function ubahPeriode(id: string, _: unknown, fd: FormData): Promise
     await db.transaction(async (tx) => {
       const p = await kunciPeriode(tx, pid, ["DRAFT", "PENILAIAN", "PERHITUNGAN"]);
       const ubahIdentitas = p.tahunAjaran !== d.tahunAjaran || p.semester !== d.semester;
-      if (ubahIdentitas && p.status !== "DRAFT") throw new GalatBisnis("Tahun ajaran dan semester hanya bisa diubah saat Draf");
+      if (ubahIdentitas && p.status !== "DRAFT")
+        throw new GalatBisnis("Tahun ajaran dan semester hanya bisa diubah saat Draf");
       const nama = `${d.tahunAjaran} ${d.semester === "GANJIL" ? "Ganjil" : "Genap"}`;
       await tx
         .update(periode)
-        .set({ nama, tahunAjaran: d.tahunAjaran, semester: d.semester, kuota: d.kuota, cakupanDefault: d.cakupanDefault })
+        .set({
+          nama,
+          tahunAjaran: d.tahunAjaran,
+          semester: d.semester,
+          kuota: d.kuota,
+          cakupanDefault: d.cakupanDefault,
+        })
         .where(eq(periode.id, pid));
-      await catatAudit({ userId: u.id, aksi: "PERIODE_UBAH", entitas: "periode", entitasId: pid, data: d }, tx);
+      await catatAudit(
+        { userId: u.id, aksi: "PERIODE_UBAH", entitas: "periode", entitasId: pid, data: d },
+        tx,
+      );
     });
     revalidatePath("/", "layout");
     return { ok: true, pesan: "Periode disimpan" };
@@ -128,13 +162,20 @@ export async function hapusPeriode(id: string): Promise<HasilAksi> {
     const pid = uuid.parse(id);
     await db.transaction(async (tx) => {
       const p = await kunciPeriode(tx, pid, ["DRAFT"]);
-      const [ada] = await tx.select({ n: sql<number>`count(*)::int` }).from(penilaian).where(eq(penilaian.periodeId, pid));
-      if ((ada?.n ?? 0) > 0) throw new GalatBisnis("Periode sudah punya data penilaian sehingga tidak bisa dihapus");
+      const [ada] = await tx
+        .select({ n: sql<number>`count(*)::int` })
+        .from(penilaian)
+        .where(eq(penilaian.periodeId, pid));
+      if ((ada?.n ?? 0) > 0)
+        throw new GalatBisnis("Periode sudah punya data penilaian sehingga tidak bisa dihapus");
       await tx.delete(alternatif).where(eq(alternatif.periodeId, pid));
       await tx.delete(perhitungan).where(eq(perhitungan.periodeId, pid));
       await tx.delete(kelas).where(eq(kelas.periodeId, pid));
       await tx.delete(periode).where(eq(periode.id, pid));
-      await catatAudit({ userId: u.id, aksi: "PERIODE_HAPUS", entitas: "periode", entitasId: pid, data: { nama: p.nama } }, tx);
+      await catatAudit(
+        { userId: u.id, aksi: "PERIODE_HAPUS", entitas: "periode", entitasId: pid, data: { nama: p.nama } },
+        tx,
+      );
     });
     revalidatePath("/", "layout");
   });
@@ -167,8 +208,12 @@ export async function ubahStatusPeriode(id: string, jenis: string, alasan?: stri
         await urutkanKodeAlternatif(tx, pid);
       }
       if (jenis === "kembaliDraf") {
-        const [ada] = await tx.select({ n: sql<number>`count(*)::int` }).from(penilaian).where(eq(penilaian.periodeId, pid));
-        if ((ada?.n ?? 0) > 0) throw new GalatBisnis("Sudah ada nilai yang diinput. Periode tidak bisa dikembalikan ke Draf");
+        const [ada] = await tx
+          .select({ n: sql<number>`count(*)::int` })
+          .from(penilaian)
+          .where(eq(penilaian.periodeId, pid));
+        if ((ada?.n ?? 0) > 0)
+          throw new GalatBisnis("Sudah ada nilai yang diinput. Periode tidak bisa dikembalikan ke Draf");
       }
       if (jenis === "bukaUlangFinal") {
         const teks = (alasan ?? "").trim();
@@ -199,4 +244,3 @@ export async function ubahStatusPeriode(id: string, jenis: string, alasan?: stri
     return { ok: true, pesan: "Status periode diperbarui" };
   });
 }
-

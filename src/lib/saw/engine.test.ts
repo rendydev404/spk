@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { hitungSaw, kepentinganKePersen, SawValidationError, type AlternatifInput, type KriteriaInput } from "./index.ts";
+import {
+  type AlternatifInput,
+  hitungSaw,
+  type KriteriaInput,
+  kepentinganKePersen,
+  SawValidationError,
+} from "./index.ts";
 
 const K: KriteriaInput[] = [
   { id: "c1", kode: "C1", jenis: "BENEFIT", bobotPersen: 30 },
@@ -98,7 +104,10 @@ describe("hitungSaw", () => {
       alt("A3", [85.0, 3, 4, 5, 4], "X1"),
     ];
     const per = hitungSaw(K, data).perKelompok;
-    const sekolah = hitungSaw(K, data.map((d) => ({ ...d, kelompok: "SEKOLAH" }))).perKelompok;
+    const sekolah = hitungSaw(
+      K,
+      data.map((d) => ({ ...d, kelompok: "SEKOLAH" })),
+    ).perKelompok;
     const a1Kelompok = per.X1!.hasil.find((h) => h.id === "A1")!;
     const a1Sekolah = sekolah.SEKOLAH!.hasil.find((h) => h.id === "A1")!;
     expect(a1Kelompok.normalisasi.c1).toBe(1);
@@ -114,7 +123,13 @@ describe("hitungSaw", () => {
     };
     for (let iter = 0; iter < 200; iter++) {
       const data = Array.from({ length: 8 }, (_, i) =>
-        alt(`S${i}`, [rnd() * 100, 1 + Math.floor(rnd() * 5), 1 + Math.floor(rnd() * 4), 1 + Math.floor(rnd() * 5), 1 + Math.floor(rnd() * 4)]),
+        alt(`S${i}`, [
+          rnd() * 100,
+          1 + Math.floor(rnd() * 5),
+          1 + Math.floor(rnd() * 4),
+          1 + Math.floor(rnd() * 5),
+          1 + Math.floor(rnd() * 4),
+        ]),
       );
       const before = hitungSaw(K, data).perKelompok.SEKOLAH!.hasil;
       for (const h of before) {
@@ -125,7 +140,9 @@ describe("hitungSaw", () => {
           expect(r).toBeLessThanOrEqual(1 + 1e-12);
         }
       }
-      const naik = data.map((d, i) => (i === 0 ? { ...d, nilai: { ...d.nilai, c4: (d.nilai.c4 ?? 0) + 1 } } : d));
+      const naik = data.map((d, i) =>
+        i === 0 ? { ...d, nilai: { ...d.nilai, c4: (d.nilai.c4 ?? 0) + 1 } } : d,
+      );
       const after = hitungSaw(K, naik).perKelompok.SEKOLAH!.hasil;
       const vb = before.find((h) => h.id === "S0")!.preferensi;
       const va = after.find((h) => h.id === "S0")!.preferensi;
@@ -134,7 +151,9 @@ describe("hitungSaw", () => {
   });
 
   it("1.000 alternatif dihitung cepat", () => {
-    const data = Array.from({ length: 1000 }, (_, i) => alt(`S${i}`, [60 + (i % 40), 1 + (i % 5), 1 + (i % 4), 1 + (i % 5), 1 + (i % 4)]));
+    const data = Array.from({ length: 1000 }, (_, i) =>
+      alt(`S${i}`, [60 + (i % 40), 1 + (i % 5), 1 + (i % 4), 1 + (i % 5), 1 + (i % 4)]),
+    );
     const t = performance.now();
     hitungSaw(K, data);
     expect(performance.now() - t).toBeLessThan(50);

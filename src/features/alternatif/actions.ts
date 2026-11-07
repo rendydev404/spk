@@ -13,7 +13,10 @@ import { kunciPeriode, urutkanKodeAlternatif } from "../periode/guard";
 const uuid = z.string().uuid();
 
 const tambahSchema = z.discriminatedUnion("cara", [
-  z.object({ cara: z.literal("siswa"), siswaIds: z.array(uuid).min(1, "Pilih minimal satu siswa").max(2000) }),
+  z.object({
+    cara: z.literal("siswa"),
+    siswaIds: z.array(uuid).min(1, "Pilih minimal satu siswa").max(2000),
+  }),
   z.object({ cara: z.literal("kelas"), kelasId: uuid }),
   z.object({ cara: z.literal("tingkat"), tingkat: z.number().int().min(1).max(12) }),
   z.object({ cara: z.literal("sekolah") }),
@@ -26,7 +29,10 @@ const tambahSchema = z.discriminatedUnion("cara", [
 async function sisipkan(tx: Tx, periodeId: string, userId: string, d: z.infer<typeof tambahSchema>) {
   const filter =
     d.cara === "siswa"
-      ? sql`and ks.siswa_id in (${sql.join(d.siswaIds.map((i) => sql`${i}::uuid`), sql`, `)})`
+      ? sql`and ks.siswa_id in (${sql.join(
+          d.siswaIds.map((i) => sql`${i}::uuid`),
+          sql`, `,
+        )})`
       : d.cara === "kelas"
         ? sql`and ks.kelas_id = ${d.kelasId}`
         : d.cara === "tingkat"
@@ -58,12 +64,19 @@ export async function tambahAlternatif(periodeId: string, input: unknown): Promi
       n = await sisipkan(tx, pid, u.id, d);
       if (p.status === "DRAFT") await urutkanKodeAlternatif(tx, pid);
       await catatAudit(
-        { userId: u.id, aksi: "ALTERNATIF_TAMBAH", entitas: "periode", entitasId: pid, data: { cara: d.cara, jumlah: n, susulan: p.status !== "DRAFT" } },
+        {
+          userId: u.id,
+          aksi: "ALTERNATIF_TAMBAH",
+          entitas: "periode",
+          entitasId: pid,
+          data: { cara: d.cara, jumlah: n, susulan: p.status !== "DRAFT" },
+        },
         tx,
       );
     });
     revalidatePath("/alternatif");
-    if (n === 0) return { ok: true, pesan: "Tidak ada siswa baru yang ditambahkan (semua sudah menjadi alternatif)" };
+    if (n === 0)
+      return { ok: true, pesan: "Tidak ada siswa baru yang ditambahkan (semua sudah menjadi alternatif)" };
     return { ok: true, pesan: `${n} siswa ditambahkan sebagai alternatif` };
   });
 }
@@ -83,7 +96,10 @@ export async function keluarkanAlternatif(periodeId: string, siswaIds: string[])
       n = r.length;
       if (n === 0) throw new GalatBisnis("Alternatif tidak ditemukan");
       await urutkanKodeAlternatif(tx, pid);
-      await catatAudit({ userId: u.id, aksi: "ALTERNATIF_KELUAR", entitas: "periode", entitasId: pid, data: { jumlah: n } }, tx);
+      await catatAudit(
+        { userId: u.id, aksi: "ALTERNATIF_KELUAR", entitas: "periode", entitasId: pid, data: { jumlah: n } },
+        tx,
+      );
     });
     revalidatePath("/alternatif");
     return { ok: true, pesan: `${n} alternatif dikeluarkan` };

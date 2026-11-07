@@ -38,7 +38,10 @@ export function Pagination({
             <Link
               href={href(p)}
               aria-current={p === page ? "page" : undefined}
-              className={cn(item, p === page ? "bg-accent-soft font-semibold text-accent" : "hover:bg-surface-2")}
+              className={cn(
+                item,
+                p === page ? "bg-accent-soft font-semibold text-accent" : "hover:bg-surface-2",
+              )}
             >
               {p}
             </Link>

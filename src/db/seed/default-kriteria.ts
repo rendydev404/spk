@@ -17,7 +17,16 @@ export interface KriteriaDefault {
 }
 
 export const KRITERIA_DEFAULT: KriteriaDefault[] = [
-  { kode: "C1", nama: "Rata-rata nilai rapor", jenis: "BENEFIT", bobot: "30", tipeInput: "ANGKA", nilaiMin: "0", nilaiMax: "100", sub: [] },
+  {
+    kode: "C1",
+    nama: "Rata-rata nilai rapor",
+    jenis: "BENEFIT",
+    bobot: "30",
+    tipeInput: "ANGKA",
+    nilaiMin: "0",
+    nilaiMax: "100",
+    sub: [],
+  },
   {
     kode: "C2",
     nama: "Ketidakhadiran (sakit + izin + alpa)",

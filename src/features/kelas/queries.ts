@@ -16,7 +16,9 @@ export async function daftarKelas(periodeId: string, p: Pengguna) {
     })
     .from(kelas)
     .leftJoin(user, eq(user.id, kelas.waliKelasId))
-    .where(and(eq(kelas.periodeId, periodeId), p.role === "WALI_KELAS" ? eq(kelas.waliKelasId, p.id) : undefined))
+    .where(
+      and(eq(kelas.periodeId, periodeId), p.role === "WALI_KELAS" ? eq(kelas.waliKelasId, p.id) : undefined),
+    )
     .orderBy(asc(kelas.tingkat), asc(kelas.nama));
 }
 
@@ -48,7 +50,10 @@ export async function anggotaKelas(kelasId: string) {
     })
     .from(kelasSiswa)
     .innerJoin(siswa, eq(siswa.id, kelasSiswa.siswaId))
-    .leftJoin(alternatif, and(eq(alternatif.periodeId, kelasSiswa.periodeId), eq(alternatif.siswaId, kelasSiswa.siswaId)))
+    .leftJoin(
+      alternatif,
+      and(eq(alternatif.periodeId, kelasSiswa.periodeId), eq(alternatif.siswaId, kelasSiswa.siswaId)),
+    )
     .where(eq(kelasSiswa.kelasId, kelasId))
     .orderBy(asc(sql`lower(${siswa.nama})`));
 }
@@ -71,4 +76,3 @@ export async function siswaTanpaKelas(periodeId: string) {
     )
     .orderBy(asc(sql`lower(${siswa.nama})`));
 }
-

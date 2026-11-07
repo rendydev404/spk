@@ -3,7 +3,9 @@
 import { useCallback, useState, useTransition } from "react";
 import { useToast } from "./toast";
 
-type Hasil = { ok: true; pesan?: string } | { ok: false; pesan: string; galat?: Record<string, string>; masalah?: string[] };
+type Hasil =
+  | { ok: true; pesan?: string }
+  | { ok: false; pesan: string; galat?: Record<string, string>; masalah?: string[] };
 
 /** Menjalankan server action dengan status pending dan notifikasi hasil. */
 export function useAksi() {

@@ -23,7 +23,13 @@ export async function cekSyaratPenilaian(periodeId: string, tx: Tx | typeof db =
   const masalah: string[] = [];
   const [daftarKriteria, subs, [kelasTanpaWali], [jumlahKelas], [jumlahAlt]] = await Promise.all([
     tx
-      .select({ id: kriteria.id, kode: kriteria.kode, bobot: kriteria.bobot, tipeInput: kriteria.tipeInput, jenis: kriteria.jenis })
+      .select({
+        id: kriteria.id,
+        kode: kriteria.kode,
+        bobot: kriteria.bobot,
+        tipeInput: kriteria.tipeInput,
+        jenis: kriteria.jenis,
+      })
       .from(kriteria)
       .where(eq(kriteria.periodeId, periodeId)),
     tx
@@ -37,14 +43,18 @@ export async function cekSyaratPenilaian(periodeId: string, tx: Tx | typeof db =
       .from(subKriteria)
       .innerJoin(kriteria, eq(kriteria.id, subKriteria.kriteriaId))
       .where(eq(kriteria.periodeId, periodeId)),
-    tx.select({ n: count() }).from(kelas).where(and(eq(kelas.periodeId, periodeId), isNull(kelas.waliKelasId))),
+    tx
+      .select({ n: count() })
+      .from(kelas)
+      .where(and(eq(kelas.periodeId, periodeId), isNull(kelas.waliKelasId))),
     tx.select({ n: count() }).from(kelas).where(eq(kelas.periodeId, periodeId)),
     tx.select({ n: count() }).from(alternatif).where(eq(alternatif.periodeId, periodeId)),
   ]);
 
   if (daftarKriteria.length === 0) masalah.push("Belum ada kriteria");
   const totalSen = daftarKriteria.reduce((s, k) => s + Math.round(Number(k.bobot) * 100), 0);
-  if (daftarKriteria.length > 0 && totalSen !== 10000) masalah.push(`Total bobot ${(totalSen / 100).toFixed(2)}%, harus 100%`);
+  if (daftarKriteria.length > 0 && totalSen !== 10000)
+    masalah.push(`Total bobot ${(totalSen / 100).toFixed(2)}%, harus 100%`);
   for (const k of daftarKriteria) {
     if (Number(k.bobot) <= 0) masalah.push(`Bobot ${k.kode} masih 0`);
     if (k.tipeInput === "ANGKA") continue;

@@ -51,6 +51,10 @@ export async function kriteriaLengkap(periodeId: string) {
 export async function getKriteria(id: string) {
   const [k] = await db.select().from(kriteria).where(eq(kriteria.id, id));
   if (!k) return null;
-  const sub = await db.select().from(subKriteria).where(eq(subKriteria.kriteriaId, id)).orderBy(asc(subKriteria.urutan));
+  const sub = await db
+    .select()
+    .from(subKriteria)
+    .where(eq(subKriteria.kriteriaId, id))
+    .orderBy(asc(subKriteria.urutan));
   return { ...k, sub };
 }

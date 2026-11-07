@@ -4,15 +4,22 @@ import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, IconButton } from "@/components/ui/button";
+import { cn } from "@/components/ui/cn";
 import { kelasInput } from "@/components/ui/field";
 import { Alert } from "@/components/ui/misc";
 import { useAksi } from "@/components/ui/use-aksi";
-import { cekRentang } from "@/lib/konversi";
 import { parseAngka } from "@/lib/format";
-import { cn } from "@/components/ui/cn";
+import { cekRentang } from "@/lib/konversi";
 import { simpanSubKriteria } from "../actions";
 
-type Baris = { key: string; id: string | null; label: string; nilai: string; batasBawah: string; batasAtas: string };
+type Baris = {
+  key: string;
+  id: string | null;
+  label: string;
+  nilai: string;
+  batasBawah: string;
+  batasAtas: string;
+};
 
 let seq = 0;
 const kunci = () => `b${++seq}`;
@@ -42,7 +49,8 @@ export function SubEditor({
       batasAtas: a.batasAtas === null ? "" : String(Number(a.batasAtas)),
     })),
   );
-  const ubah = (key: string, f: keyof Baris, v: string) => setRows((r) => r.map((x) => (x.key === key ? { ...x, [f]: v } : x)));
+  const ubah = (key: string, f: keyof Baris, v: string) =>
+    setRows((r) => r.map((x) => (x.key === key ? { ...x, [f]: v } : x)));
 
   // Validasi langsung di client untuk umpan balik cepat (server tetap memvalidasi).
   const masalah: string[] = [];
@@ -53,7 +61,13 @@ export function SubEditor({
   }
   if (tipe === "RENTANG") {
     masalah.push(
-      ...cekRentang(rows.map((r) => ({ label: r.label || "?", batasBawah: parseAngka(r.batasBawah), batasAtas: parseAngka(r.batasAtas) }))),
+      ...cekRentang(
+        rows.map((r) => ({
+          label: r.label || "?",
+          batasBawah: parseAngka(r.batasBawah),
+          batasAtas: parseAngka(r.batasAtas),
+        })),
+      ),
     );
   }
   const unik = [...new Set(masalah)];
@@ -80,7 +94,8 @@ export function SubEditor({
     <div className="flex flex-col gap-4">
       {jenis === "COST" ? (
         <Alert tone="info" title="Kriteria cost">
-          Skala terkecil berarti kondisi terbaik. Semua nilai skala harus lebih dari 0 agar normalisasi min/x tidak membagi dengan nol.
+          Skala terkecil berarti kondisi terbaik. Semua nilai skala harus lebih dari 0 agar normalisasi min/x
+          tidak membagi dengan nol.
         </Alert>
       ) : null}
       <div className="panel overflow-x-auto">
@@ -95,19 +110,36 @@ export function SubEditor({
                 </>
               ) : null}
               <th className="w-32">Nilai skala</th>
-              {bisaUbah ? <th className="w-12"><span className="sr-only">Hapus</span></th> : null}
+              {bisaUbah ? (
+                <th className="w-12">
+                  <span className="sr-only">Hapus</span>
+                </th>
+              ) : null}
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => (
               <tr key={r.key}>
                 <td>
-                  <input aria-label={`Label baris ${i + 1}`} className={sel} value={r.label} disabled={!bisaUbah} onChange={(e) => ubah(r.key, "label", e.target.value)} />
+                  <input
+                    aria-label={`Label baris ${i + 1}`}
+                    className={sel}
+                    value={r.label}
+                    disabled={!bisaUbah}
+                    onChange={(e) => ubah(r.key, "label", e.target.value)}
+                  />
                 </td>
                 {tipe === "RENTANG" ? (
                   <>
                     <td>
-                      <input aria-label={`Batas bawah baris ${i + 1}`} inputMode="decimal" className={cn(sel, "tabular")} value={r.batasBawah} disabled={!bisaUbah} onChange={(e) => ubah(r.key, "batasBawah", e.target.value)} />
+                      <input
+                        aria-label={`Batas bawah baris ${i + 1}`}
+                        inputMode="decimal"
+                        className={cn(sel, "tabular")}
+                        value={r.batasBawah}
+                        disabled={!bisaUbah}
+                        onChange={(e) => ubah(r.key, "batasBawah", e.target.value)}
+                      />
                     </td>
                     <td>
                       <input
@@ -123,11 +155,22 @@ export function SubEditor({
                   </>
                 ) : null}
                 <td>
-                  <input aria-label={`Nilai skala baris ${i + 1}`} inputMode="decimal" className={cn(sel, "tabular")} value={r.nilai} disabled={!bisaUbah} onChange={(e) => ubah(r.key, "nilai", e.target.value)} />
+                  <input
+                    aria-label={`Nilai skala baris ${i + 1}`}
+                    inputMode="decimal"
+                    className={cn(sel, "tabular")}
+                    value={r.nilai}
+                    disabled={!bisaUbah}
+                    onChange={(e) => ubah(r.key, "nilai", e.target.value)}
+                  />
                 </td>
                 {bisaUbah ? (
                   <td>
-                    <IconButton label={`Hapus baris ${i + 1}`} onClick={() => setRows((x) => x.filter((y) => y.key !== r.key))} className="hover:text-danger">
+                    <IconButton
+                      label={`Hapus baris ${i + 1}`}
+                      onClick={() => setRows((x) => x.filter((y) => y.key !== r.key))}
+                      className="hover:text-danger"
+                    >
                       <Trash2 className="size-4" aria-hidden />
                     </IconButton>
                   </td>
@@ -149,7 +192,15 @@ export function SubEditor({
             </Alert>
           ) : null}
           <div className="flex flex-wrap justify-between gap-2">
-            <Button variant="secondary" onClick={() => setRows((r) => [...r, { key: kunci(), id: null, label: "", nilai: "", batasBawah: "", batasAtas: "" }])}>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setRows((r) => [
+                  ...r,
+                  { key: kunci(), id: null, label: "", nilai: "", batasBawah: "", batasAtas: "" },
+                ])
+              }
+            >
               <Plus className="size-4" aria-hidden /> Tambah baris
             </Button>
             <Button onClick={simpan} loading={pending} disabled={rows.length === 0 || unik.length > 0}>

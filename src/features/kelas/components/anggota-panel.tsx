@@ -12,7 +12,14 @@ import { Select } from "@/components/ui/select";
 import { useAksi } from "@/components/ui/use-aksi";
 import { keluarkanAnggota, pindahkanAnggota, tambahAnggota } from "../actions";
 
-type Anggota = { id: string; nis: string; nama: string; jenisKelamin: "L" | "P"; aktif: boolean; kodeAlternatif: string | null };
+type Anggota = {
+  id: string;
+  nis: string;
+  nama: string;
+  jenisKelamin: "L" | "P";
+  aktif: boolean;
+  kodeAlternatif: string | null;
+};
 
 export function AnggotaPanel({
   kelasId,
@@ -52,7 +59,9 @@ export function AnggotaPanel({
           <Button
             disabled={pilih.length === 0}
             loading={pending}
-            onClick={() => jalan(() => tambahAnggota(kelasId, pilih), { onOk: () => (setPilih([]), refresh()) })}
+            onClick={() =>
+              jalan(() => tambahAnggota(kelasId, pilih), { onOk: () => (setPilih([]), refresh()) })
+            }
             className="mb-[22px]"
           >
             <UserPlus className="size-4" aria-hidden /> Tambahkan {pilih.length > 0 ? pilih.length : ""}
@@ -73,7 +82,11 @@ export function AnggotaPanel({
                 <th>Nama</th>
                 <th>JK</th>
                 <th>Alternatif</th>
-                {bisaUbah ? <th className="w-12"><span className="sr-only">Aksi</span></th> : null}
+                {bisaUbah ? (
+                  <th className="w-12">
+                    <span className="sr-only">Aksi</span>
+                  </th>
+                ) : null}
               </tr>
             </thead>
             <tbody>
@@ -85,7 +98,13 @@ export function AnggotaPanel({
                     {a.nama} {!a.aktif ? <Badge tone="warning">Nonaktif</Badge> : null}
                   </td>
                   <td>{a.jenisKelamin}</td>
-                  <td>{a.kodeAlternatif ? <Badge tone="accent">{a.kodeAlternatif}</Badge> : <span className="text-muted">-</span>}</td>
+                  <td>
+                    {a.kodeAlternatif ? (
+                      <Badge tone="accent">{a.kodeAlternatif}</Badge>
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
+                  </td>
                   {bisaUbah ? (
                     <td>
                       <RD.Root>
@@ -96,7 +115,10 @@ export function AnggotaPanel({
                           <MoreHorizontal className="size-4" aria-hidden />
                         </RD.Trigger>
                         <RD.Portal>
-                          <RD.Content align="end" className="z-50 min-w-48 rounded-md border border-border bg-surface p-1 shadow-pop">
+                          <RD.Content
+                            align="end"
+                            className="z-50 min-w-48 rounded-md border border-border bg-surface p-1 shadow-pop"
+                          >
                             <RD.Item
                               disabled={kelasLain.length === 0}
                               onSelect={() => setPindah(a)}
@@ -135,7 +157,8 @@ export function AnggotaPanel({
         danger
         loading={pending}
         onConfirm={() =>
-          keluar && jalan(() => keluarkanAnggota(kelasId, keluar.id), { onOk: () => (setKeluar(null), refresh()) })
+          keluar &&
+          jalan(() => keluarkanAnggota(kelasId, keluar.id), { onOk: () => (setKeluar(null), refresh()) })
         }
       />
       <Dialog
@@ -152,7 +175,10 @@ export function AnggotaPanel({
               disabled={!tujuan}
               loading={pending}
               onClick={() =>
-                pindah && jalan(() => pindahkanAnggota(kelasId, pindah.id, tujuan), { onOk: () => (setPindah(null), setTujuan(""), refresh()) })
+                pindah &&
+                jalan(() => pindahkanAnggota(kelasId, pindah.id, tujuan), {
+                  onOk: () => (setPindah(null), setTujuan(""), refresh()),
+                })
               }
             >
               Pindahkan
@@ -160,7 +186,12 @@ export function AnggotaPanel({
           </>
         }
       >
-        <Select label="Kelas tujuan" value={tujuan} onValueChange={setTujuan} options={kelasLain.map((k) => ({ value: k.id, label: k.nama }))} />
+        <Select
+          label="Kelas tujuan"
+          value={tujuan}
+          onValueChange={setTujuan}
+          options={kelasLain.map((k) => ({ value: k.id, label: k.nama }))}
+        />
       </Dialog>
     </div>
   );

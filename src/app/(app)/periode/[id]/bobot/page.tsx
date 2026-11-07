@@ -26,7 +26,8 @@ export default async function BobotPage({ params }: { params: Promise<{ id: stri
         title="Bobot kriteria"
         description={
           <span className="inline-flex flex-wrap items-center gap-2">
-            Periode {p.nama} <StatusBadge status={p.status} /> Total bobot harus tepat 100% sebelum penilaian dibuka.
+            Periode {p.nama} <StatusBadge status={p.status} /> Total bobot harus tepat 100% sebelum penilaian
+            dibuka.
           </span>
         }
       />
@@ -44,7 +45,14 @@ export default async function BobotPage({ params }: { params: Promise<{ id: stri
           periodeId={id}
           modeAwal={p.modeBobot}
           bisaUbah={bisaUbah}
-          kriteria={kriteria.map((k) => ({ id: k.id, kode: k.kode, nama: k.nama, jenis: k.jenis, bobot: k.bobot, kepentingan: k.kepentingan }))}
+          kriteria={kriteria.map((k) => ({
+            id: k.id,
+            kode: k.kode,
+            nama: k.nama,
+            jenis: k.jenis,
+            bobot: k.bobot,
+            kepentingan: k.kepentingan,
+          }))}
         />
       )}
     </>

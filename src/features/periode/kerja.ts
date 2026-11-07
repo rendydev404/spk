@@ -36,6 +36,9 @@ export const getPeriodeKerja = cache(async () => {
     .orderBy(desc(periode.tahunAjaran), desc(periode.semester));
   const pilihan = (await cookies()).get(COOKIE_PERIODE)?.value;
   const kerja =
-    semua.find((p) => p.id === pilihan) ?? semua.find((p) => STATUS_AKTIF.includes(p.status)) ?? semua[0] ?? null;
+    semua.find((p) => p.id === pilihan) ??
+    semua.find((p) => STATUS_AKTIF.includes(p.status)) ??
+    semua[0] ??
+    null;
   return { kerja, semua };
 });

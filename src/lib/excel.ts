@@ -12,7 +12,11 @@ export function teksSel(v: ExcelJS.CellValue): string {
     return `${v.getUTCFullYear()}-${String(v.getUTCMonth() + 1).padStart(2, "0")}-${String(v.getUTCDate()).padStart(2, "0")}`;
   }
   if (typeof v === "object") {
-    if ("richText" in v) return v.richText.map((r) => r.text).join("").trim();
+    if ("richText" in v)
+      return v.richText
+        .map((r) => r.text)
+        .join("")
+        .trim();
     if ("result" in v) return teksSel(v.result as ExcelJS.CellValue);
     if ("text" in v) return String(v.text).trim();
     return "";
@@ -21,7 +25,10 @@ export function teksSel(v: ExcelJS.CellValue): string {
 }
 
 /** Memeriksa file unggahan dan membaca sheet pertama sebagai baris teks (tanpa header). */
-export async function bacaXlsx(file: File | null, jumlahKolom: number): Promise<{ baris: string[][]; header: string[] }> {
+export async function bacaXlsx(
+  file: File | null,
+  jumlahKolom: number,
+): Promise<{ baris: string[][]; header: string[] }> {
   if (!file || file.size === 0) throw new Error("FILE_KOSONG");
   if (file.size > MAKS_UKURAN_IMPOR) throw new Error("FILE_BESAR");
   if (!file.name.toLowerCase().endsWith(".xlsx")) throw new Error("FILE_FORMAT");
@@ -50,7 +57,7 @@ export const PESAN_FILE: Record<string, string> = {
 /** Gaya header seragam untuk semua file ekspor. */
 export function gayaHeader(row: ExcelJS.Row) {
   row.font = { bold: true, color: { argb: "FFFFFFFF" } };
-  row.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F5F4A" } };
+  row.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1D4ED8" } };
   row.alignment = { vertical: "middle" };
   row.height = 20;
 }

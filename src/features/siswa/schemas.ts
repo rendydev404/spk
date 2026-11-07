@@ -11,7 +11,12 @@ export const siswaSchema = z.object({
     .string()
     .trim()
     .transform((v) => (v === "" ? null : v))
-    .pipe(z.string().regex(/^\d{10}$/, "NISN harus 10 digit").nullable()),
+    .pipe(
+      z
+        .string()
+        .regex(/^\d{10}$/, "NISN harus 10 digit")
+        .nullable(),
+    ),
   nama: z.string().trim().min(2, "Nama minimal 2 karakter").max(100, "Nama maksimal 100 karakter"),
   jenisKelamin: z.enum(["L", "P"], { message: "Pilih jenis kelamin" }),
   tanggalLahir: z

@@ -41,7 +41,12 @@ export function KelasDialog({
           <Plus className="size-4" aria-hidden /> Kelas baru
         </Button>
       )}
-      <Dialog open={open} onOpenChange={setOpen} title={nilai ? `Ubah ${nilai.nama}` : "Kelas baru"} size="sm">
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title={nilai ? `Ubah ${nilai.nama}` : "Kelas baru"}
+        size="sm"
+      >
         <FormAksi
           action={simpanKelas.bind(null, periodeId, nilai?.id ?? null)}
           onOk={() => {
@@ -52,7 +57,15 @@ export function KelasDialog({
         >
           {({ pending, galat }) => (
             <>
-              <TextField label="Nama kelas" name="nama" defaultValue={nilai?.nama} placeholder="XI IPA 1" readOnly={hanyaWali} error={galat.nama} required />
+              <TextField
+                label="Nama kelas"
+                name="nama"
+                defaultValue={nilai?.nama}
+                placeholder="XI IPA 1"
+                readOnly={hanyaWali}
+                error={galat.nama}
+                required
+              />
               <Select
                 label="Tingkat"
                 name="tingkat"

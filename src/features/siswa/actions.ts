@@ -21,11 +21,26 @@ export async function simpanSiswa(id: string | null, _: unknown, fd: FormData): 
     const aktif = fd.get("aktif") === "on" || fd.get("aktif") === "true";
     if (id) {
       const sid = uuid.parse(id);
-      await db.update(siswa).set({ ...d, aktif }).where(eq(siswa.id, sid));
-      await catatAudit({ userId: u.id, aksi: "SISWA_UBAH", entitas: "siswa", entitasId: sid, data: { nis: d.nis, aktif } });
+      await db
+        .update(siswa)
+        .set({ ...d, aktif })
+        .where(eq(siswa.id, sid));
+      await catatAudit({
+        userId: u.id,
+        aksi: "SISWA_UBAH",
+        entitas: "siswa",
+        entitasId: sid,
+        data: { nis: d.nis, aktif },
+      });
     } else {
       const [s] = await db.insert(siswa).values(d).returning({ id: siswa.id });
-      await catatAudit({ userId: u.id, aksi: "SISWA_BUAT", entitas: "siswa", entitasId: s!.id, data: { nis: d.nis } });
+      await catatAudit({
+        userId: u.id,
+        aksi: "SISWA_BUAT",
+        entitas: "siswa",
+        entitasId: s!.id,
+        data: { nis: d.nis },
+      });
     }
     revalidatePath("/siswa");
     return { ok: true, pesan: id ? "Data siswa disimpan" : "Siswa ditambahkan" };
@@ -45,7 +60,10 @@ export async function hapusSiswa(id: string): Promise<HasilAksi> {
       await db.update(siswa).set({ aktif: false }).where(eq(siswa.id, sid));
       await catatAudit({ userId: u.id, aksi: "SISWA_NONAKTIF", entitas: "siswa", entitasId: sid });
       revalidatePath("/siswa");
-      return { ok: true, pesan: "Siswa sudah punya riwayat kelas atau penilaian, jadi dinonaktifkan (tidak dihapus)" };
+      return {
+        ok: true,
+        pesan: "Siswa sudah punya riwayat kelas atau penilaian, jadi dinonaktifkan (tidak dihapus)",
+      };
     }
     await db.delete(siswa).where(eq(siswa.id, sid));
     await catatAudit({ userId: u.id, aksi: "SISWA_HAPUS", entitas: "siswa", entitasId: sid });
@@ -82,7 +100,9 @@ function normalTanggal(v: string) {
 
 async function validasiImpor(baris: string[][]) {
   const { kerja } = await getPeriodeKerja();
-  const daftarKelas = kerja ? await db.select({ id: kelas.id, nama: kelas.nama }).from(kelas).where(eq(kelas.periodeId, kerja.id)) : [];
+  const daftarKelas = kerja
+    ? await db.select({ id: kelas.id, nama: kelas.nama }).from(kelas).where(eq(kelas.periodeId, kerja.id))
+    : [];
   const petaKelas = new Map(daftarKelas.map((k) => [k.nama.toLowerCase(), k.id]));
   const nisList = baris.map((b) => b[0]?.trim() ?? "").filter(Boolean);
   const ada = nisList.length
@@ -96,7 +116,13 @@ async function validasiImpor(baris: string[][]) {
     const [nis = "", nisn = "", nama = "", jk = "", tgl = "", kls = ""] = b;
     const no = i + 2;
     const galat: string[] = [];
-    const r = siswaSchema.safeParse({ nis, nisn, nama, jenisKelamin: normalJk(jk), tanggalLahir: normalTanggal(tgl) });
+    const r = siswaSchema.safeParse({
+      nis,
+      nisn,
+      nama,
+      jenisKelamin: normalJk(jk),
+      tanggalLahir: normalTanggal(tgl),
+    });
     if (!r.success) for (const iss of r.error.issues) galat.push(iss.message);
     if (nis) {
       if (lihatNis.has(nis)) galat.push(`NIS sama dengan baris ${lihatNis.get(nis)}`);
@@ -108,8 +134,10 @@ async function validasiImpor(baris: string[][]) {
     }
     if (kls) {
       if (!kerja) galat.push("Belum ada periode untuk kelas");
-      else if (kerja.status !== "DRAFT") galat.push(`Kelas hanya bisa diisi saat periode ${kerja.nama} berstatus Draf`);
-      else if (!petaKelas.has(kls.toLowerCase())) galat.push(`Kelas "${kls}" tidak ada di periode ${kerja.nama}`);
+      else if (kerja.status !== "DRAFT")
+        galat.push(`Kelas hanya bisa diisi saat periode ${kerja.nama} berstatus Draf`);
+      else if (!petaKelas.has(kls.toLowerCase()))
+        galat.push(`Kelas "${kls}" tidak ada di periode ${kerja.nama}`);
     }
     return {
       baris: no,
@@ -126,7 +154,10 @@ async function validasiImpor(baris: string[][]) {
   return { hasil, kerja, petaKelas };
 }
 
-export async function pratinjauImporSiswa(_: unknown, fd: FormData): Promise<HasilAksi<{ baris: BarisImpor[] }>> {
+export async function pratinjauImporSiswa(
+  _: unknown,
+  fd: FormData,
+): Promise<HasilAksi<{ baris: BarisImpor[] }>> {
   return jalankan(async () => {
     await requireRole("ADMIN");
     let baris: string[][];
@@ -135,7 +166,9 @@ export async function pratinjauImporSiswa(_: unknown, fd: FormData): Promise<Has
       if (r.header[0]?.toUpperCase() !== "NIS") throw new Error("FILE_FORMAT");
       baris = r.baris;
     } catch (e) {
-      throw new GalatBisnis(PESAN_FILE[(e as Error).message] ?? "File tidak bisa dibaca. Pastikan memakai template.");
+      throw new GalatBisnis(
+        PESAN_FILE[(e as Error).message] ?? "File tidak bisa dibaca. Pastikan memakai template.",
+      );
     }
     if (baris.length === 0) throw new GalatBisnis("File tidak berisi data siswa");
     const { hasil } = await validasiImpor(baris);
@@ -147,7 +180,10 @@ export async function pratinjauImporSiswa(_: unknown, fd: FormData): Promise<Has
 export async function konfirmasiImporSiswa(baris: string[][]): Promise<HasilAksi> {
   return jalankan(async () => {
     const u = await requireRole("ADMIN");
-    const input = z.array(z.array(z.string().max(200)).length(KOLOM.length)).max(5000).parse(baris);
+    const input = z
+      .array(z.array(z.string().max(200)).length(KOLOM.length))
+      .max(5000)
+      .parse(baris);
     const { hasil, kerja, petaKelas } = await validasiImpor(input);
     const valid = hasil.filter((h) => h.galat.length === 0);
     if (valid.length === 0) throw new GalatBisnis("Tidak ada baris valid untuk disimpan");
@@ -177,20 +213,34 @@ export async function konfirmasiImporSiswa(baris: string[][]): Promise<HasilAksi
       const idByNis = new Map(tersimpan.map((t) => [t.nis, t.id]));
       const anggota = valid
         .filter((v) => v.kelas && kerja)
-        .map((v) => ({ kelasId: petaKelas.get(v.kelas.toLowerCase())!, siswaId: idByNis.get(v.nis)!, periodeId: kerja!.id }));
+        .map((v) => ({
+          kelasId: petaKelas.get(v.kelas.toLowerCase())!,
+          siswaId: idByNis.get(v.nis)!,
+          periodeId: kerja!.id,
+        }));
       if (anggota.length) {
         await tx
           .insert(kelasSiswa)
           .values(anggota)
-          .onConflictDoUpdate({ target: [kelasSiswa.periodeId, kelasSiswa.siswaId], set: { kelasId: sql`excluded.kelas_id` } });
+          .onConflictDoUpdate({
+            target: [kelasSiswa.periodeId, kelasSiswa.siswaId],
+            set: { kelasId: sql`excluded.kelas_id` },
+          });
       }
       await catatAudit(
-        { userId: u.id, aksi: "SISWA_IMPOR", entitas: "siswa", data: { jumlah: valid.length, kelas: anggota.length, ditolak: hasil.length - valid.length } },
+        {
+          userId: u.id,
+          aksi: "SISWA_IMPOR",
+          entitas: "siswa",
+          data: { jumlah: valid.length, kelas: anggota.length, ditolak: hasil.length - valid.length },
+        },
         tx,
       );
     });
     revalidatePath("/siswa");
-    return { ok: true, pesan: `${valid.length} siswa disimpan${hasil.length - valid.length ? `, ${hasil.length - valid.length} baris dilewati` : ""}` };
+    return {
+      ok: true,
+      pesan: `${valid.length} siswa disimpan${hasil.length - valid.length ? `, ${hasil.length - valid.length} baris dilewati` : ""}`,
+    };
   });
 }
-

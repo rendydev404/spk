@@ -18,7 +18,10 @@ export async function daftarAlternatif(periodeId: string, p: Pengguna, kelasId?:
     })
     .from(alternatif)
     .innerJoin(siswa, eq(siswa.id, alternatif.siswaId))
-    .innerJoin(kelasSiswa, and(eq(kelasSiswa.periodeId, alternatif.periodeId), eq(kelasSiswa.siswaId, alternatif.siswaId)))
+    .innerJoin(
+      kelasSiswa,
+      and(eq(kelasSiswa.periodeId, alternatif.periodeId), eq(kelasSiswa.siswaId, alternatif.siswaId)),
+    )
     .innerJoin(kelas, eq(kelas.id, kelasSiswa.kelasId))
     .where(
       and(
@@ -31,7 +34,10 @@ export async function daftarAlternatif(periodeId: string, p: Pengguna, kelasId?:
 }
 
 export async function jumlahKriteria(periodeId: string) {
-  const [r] = await db.select({ n: sql<number>`count(*)::int` }).from(kriteria).where(eq(kriteria.periodeId, periodeId));
+  const [r] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(kriteria)
+    .where(eq(kriteria.periodeId, periodeId));
   return r?.n ?? 0;
 }
 

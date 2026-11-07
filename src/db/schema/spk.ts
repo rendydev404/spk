@@ -152,10 +152,7 @@ export const kriteria = pgTable(
     unique().on(t.periodeId, t.kode),
     check("kriteria_kode_format", sql`${t.kode} ~ '^C\\d+$'`),
     check("kriteria_bobot_valid", sql`${t.bobot} >= 0 and ${t.bobot} <= 100`),
-    check(
-      "kriteria_kepentingan_valid",
-      sql`${t.kepentingan} is null or ${t.kepentingan} between 1 and 5`,
-    ),
+    check("kriteria_kepentingan_valid", sql`${t.kepentingan} is null or ${t.kepentingan} between 1 and 5`),
   ],
 );
 
@@ -172,10 +169,7 @@ export const subKriteria = pgTable(
     batasAtas: numeric({ precision: 8, scale: 2 }),
     urutan: smallint().notNull().default(0),
   },
-  (t) => [
-    unique().on(t.kriteriaId, t.label),
-    check("sub_kriteria_nilai_positif", sql`${t.nilai} > 0`),
-  ],
+  (t) => [unique().on(t.kriteriaId, t.label), check("sub_kriteria_nilai_positif", sql`${t.nilai} > 0`)],
 );
 
 export const alternatif = pgTable(
@@ -256,9 +250,7 @@ export const perhitungan = pgTable(
   },
   (t) => [
     index().on(t.periodeId, t.dihitungPada.desc()),
-    uniqueIndex("perhitungan_satu_disetujui")
-      .on(t.periodeId)
-      .where(sql`${t.status} = 'DISETUJUI'`),
+    uniqueIndex("perhitungan_satu_disetujui").on(t.periodeId).where(sql`${t.status} = 'DISETUJUI'`),
   ],
 );
 
@@ -319,11 +311,7 @@ export const auditLog = pgTable(
     data: jsonb(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [
-    index().on(t.createdAt.desc()),
-    index().on(t.entitas, t.entitasId),
-    index().on(t.userId),
-  ],
+  (t) => [index().on(t.createdAt.desc()), index().on(t.entitas, t.entitasId), index().on(t.userId)],
 );
 
 export const pengaturanSekolah = pgTable(

@@ -41,12 +41,17 @@ export function Dialog({
                 <RD.Description className="mt-1 text-[13px] text-muted">{description}</RD.Description>
               ) : null}
             </div>
-            <RD.Close className="-mr-1 grid size-7 place-items-center rounded-sm text-muted hover:bg-surface-2" aria-label="Tutup">
+            <RD.Close
+              className="-mr-1 grid size-7 place-items-center rounded-sm text-muted hover:bg-surface-2"
+              aria-label="Tutup"
+            >
               <X className="size-4" aria-hidden />
             </RD.Close>
           </div>
           <div className="overflow-y-auto px-5 py-4">{children}</div>
-          {footer ? <div className="flex justify-end gap-2 border-t border-border px-5 py-3">{footer}</div> : null}
+          {footer ? (
+            <div className="flex justify-end gap-2 border-t border-border px-5 py-3">{footer}</div>
+          ) : null}
         </RD.Content>
       </RD.Portal>
     </RD.Root>

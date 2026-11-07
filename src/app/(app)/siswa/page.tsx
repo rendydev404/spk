@@ -1,6 +1,7 @@
 import { Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { z } from "zod";
 import { FilterSelect, SearchBox } from "@/components/ui/filter";
 import { Badge, EmptyState, PageHeader } from "@/components/ui/misc";
 import { Pagination } from "@/components/ui/pagination";
@@ -12,13 +13,15 @@ import { SiswaDialog } from "@/features/siswa/components/siswa-dialog";
 import { cariSiswa, PER_HALAMAN } from "@/features/siswa/queries";
 import { fmtTanggal } from "@/lib/format";
 import { requireUser } from "@/lib/rbac";
-import { z } from "zod";
 
 export const metadata: Metadata = { title: "Data siswa" };
 
 const paramSchema = z.object({
   q: z.string().max(100).optional(),
-  kelas: z.union([z.string().uuid(), z.literal("tanpa")]).optional().catch(undefined),
+  kelas: z
+    .union([z.string().uuid(), z.literal("tanpa")])
+    .optional()
+    .catch(undefined),
   status: z.enum(["aktif", "nonaktif"]).optional().catch(undefined),
   page: z.coerce.number().int().min(1).max(10000).catch(1),
 });
@@ -43,7 +46,13 @@ export default async function SiswaPage({ searchParams }: { searchParams: Promis
       );
     }
   }
-  const { rows, total } = await cariSiswa({ periodeId: kerja?.id ?? null, q: sp.q, kelasId: kelasFilter, status: sp.status, page: sp.page });
+  const { rows, total } = await cariSiswa({
+    periodeId: kerja?.id ?? null,
+    q: sp.q,
+    kelasId: kelasFilter,
+    status: sp.status,
+    page: sp.page,
+  });
   const admin = u.role === "ADMIN";
   const totalPages = Math.max(1, Math.ceil(total / PER_HALAMAN));
   const href = (p: number) => {
@@ -91,7 +100,11 @@ export default async function SiswaPage({ searchParams }: { searchParams: Promis
         </div>
         <div className="overflow-x-auto">
           {rows.length === 0 ? (
-            <EmptyState icon={<Users />} title="Tidak ada siswa" description={sp.q ? "Coba kata kunci lain." : undefined} />
+            <EmptyState
+              icon={<Users />}
+              title="Tidak ada siswa"
+              description={sp.q ? "Coba kata kunci lain." : undefined}
+            />
           ) : (
             <table className="tabel">
               <thead>
@@ -103,7 +116,11 @@ export default async function SiswaPage({ searchParams }: { searchParams: Promis
                   <th>Tanggal lahir</th>
                   <th>Kelas</th>
                   <th>Status</th>
-                  {admin ? <th className="w-20"><span className="sr-only">Aksi</span></th> : null}
+                  {admin ? (
+                    <th className="w-20">
+                      <span className="sr-only">Aksi</span>
+                    </th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody>
@@ -119,7 +136,9 @@ export default async function SiswaPage({ searchParams }: { searchParams: Promis
                     <td>{s.jenisKelamin}</td>
                     <td className="tabular">{fmtTanggal(s.tanggalLahir)}</td>
                     <td>{s.kelasNama ?? <span className="text-muted">-</span>}</td>
-                    <td>{s.aktif ? <Badge tone="success">Aktif</Badge> : <Badge tone="warning">Nonaktif</Badge>}</td>
+                    <td>
+                      {s.aktif ? <Badge tone="success">Aktif</Badge> : <Badge tone="warning">Nonaktif</Badge>}
+                    </td>
                     {admin ? (
                       <td>
                         <div className="flex justify-end">

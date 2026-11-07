@@ -2,8 +2,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ToastProvider } from "@/components/ui/toast";
-import { getPeriodeKerja } from "@/features/periode/kerja";
 import { getPengaturan } from "@/features/pengaturan/queries";
+import { getPeriodeKerja } from "@/features/periode/kerja";
 import { requireUser } from "@/lib/rbac";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

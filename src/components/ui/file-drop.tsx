@@ -42,8 +42,9 @@ export function FileDrop({
 
   return (
     <div>
-      <label
-        htmlFor={id}
+      <button
+        type="button"
+        onClick={() => ref.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
           setOver(true);
@@ -54,15 +55,8 @@ export function FileDrop({
           setOver(false);
           pilih(e.dataTransfer.files[0] ?? null);
         }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            ref.current?.click();
-          }
-        }}
-        tabIndex={0}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-md border border-dashed border-border-strong px-4 py-7 text-center transition-colors hover:bg-surface-2 focus-visible:outline-2",
+          "flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-md border border-dashed border-border-strong px-4 py-7 text-center transition-colors hover:bg-surface-2 focus-visible:outline-2",
           over && "border-accent bg-accent-soft",
         )}
       >
@@ -70,7 +64,9 @@ export function FileDrop({
           <>
             <FileSpreadsheet className="size-6 text-accent" aria-hidden />
             <span className="text-sm font-medium">{file.name}</span>
-            <span className="text-xs text-muted">{(file.size / 1024).toFixed(0)} KB. Klik untuk mengganti.</span>
+            <span className="text-xs text-muted">
+              {(file.size / 1024).toFixed(0)} KB. Klik untuk mengganti.
+            </span>
           </>
         ) : (
           <>
@@ -79,7 +75,7 @@ export function FileDrop({
             <span className="text-xs text-muted">Format .xlsx, maksimal {maxMb} MB</span>
           </>
         )}
-      </label>
+      </button>
       <input
         ref={ref}
         id={id}

@@ -50,7 +50,9 @@ export function ImporSiswaDialog() {
                 onClick={() =>
                   jalan(
                     () =>
-                      konfirmasiImporSiswa(valid.map((v) => [v.nis, v.nisn, v.nama, v.jenisKelamin, v.tanggalLahir, v.kelas])),
+                      konfirmasiImporSiswa(
+                        valid.map((v) => [v.nis, v.nisn, v.nama, v.jenisKelamin, v.tanggalLahir, v.kelas]),
+                      ),
                     {
                       onOk: () => {
                         setOpen(false);
@@ -88,7 +90,9 @@ export function ImporSiswaDialog() {
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap gap-2 text-[13px]">
               <Badge tone="success">{valid.length} valid</Badge>
-              {invalid.length ? <Badge tone="danger">{invalid.length} bermasalah, tidak disimpan</Badge> : null}
+              {invalid.length ? (
+                <Badge tone="danger">{invalid.length} bermasalah, tidak disimpan</Badge>
+              ) : null}
               <Badge>{valid.filter((v) => v.baru).length} siswa baru</Badge>
               <Badge>{valid.filter((v) => !v.baru).length} diperbarui</Badge>
             </div>

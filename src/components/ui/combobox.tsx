@@ -43,7 +43,7 @@ function Listbox({
 }) {
   const { tampil, total } = useDaftar(options, q);
   const [aktif, setAktif] = useState(0);
-  const listRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   function onKey(e: KeyboardEvent) {
     if (e.key === "ArrowDown") {
@@ -72,6 +72,7 @@ function Listbox({
           aria-controls={`${id}-list`}
           aria-activedescendant={tampil[aktif] ? `${id}-o-${aktif}` : undefined}
           aria-autocomplete="list"
+          // biome-ignore lint/a11y/noAutofocus: fokus dipindah ke kotak cari saat popover dibuka
           autoFocus
           value={q}
           onChange={(e) => {
@@ -83,18 +84,23 @@ function Listbox({
           className="h-9 w-full bg-transparent text-sm outline-none placeholder:text-muted/70"
         />
       </div>
-      <ul
+      <div
         ref={listRef}
         id={`${id}-list`}
         role="listbox"
         aria-multiselectable={multi || undefined}
         className="max-h-64 overflow-y-auto p-1"
       >
-        {tampil.length === 0 ? <li className="px-3 py-6 text-center text-[13px] text-muted">Tidak ditemukan</li> : null}
+        {tampil.length === 0 ? (
+          <div className="px-3 py-6 text-center text-[13px] text-muted">Tidak ditemukan</div>
+        ) : null}
         {tampil.map((o, i) => {
           const sel = isSelected(o.value);
           return (
-            <li
+            // Pola aria-activedescendant: fokus tetap di input, opsi dipilih lewat panah/Enter di input.
+            // biome-ignore lint/a11y/useFocusableInteractive: fokus dikelola oleh combobox
+            // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard ditangani di input combobox
+            <div
               key={o.value}
               id={`${id}-o-${i}`}
               role="option"
@@ -115,19 +121,23 @@ function Listbox({
                   multi && sel && "border-accent bg-accent text-accent-fg",
                 )}
               >
-                {sel ? <Check className={cn("size-3", !multi && "text-accent")} strokeWidth={3} aria-hidden /> : null}
+                {sel ? (
+                  <Check className={cn("size-3", !multi && "text-accent")} strokeWidth={3} aria-hidden />
+                ) : null}
               </span>
               <span className="truncate">{o.label}</span>
-              {o.keterangan ? <span className="ml-auto shrink-0 text-xs text-muted">{o.keterangan}</span> : null}
-            </li>
+              {o.keterangan ? (
+                <span className="ml-auto shrink-0 text-xs text-muted">{o.keterangan}</span>
+              ) : null}
+            </div>
           );
         })}
         {total > tampil.length ? (
-          <li className="px-2 py-1.5 text-xs text-muted">
+          <div className="px-2 py-1.5 text-xs text-muted">
             {total - tampil.length} lainnya. Ketik untuk mempersempit.
-          </li>
+          </div>
         ) : null}
-      </ul>
+      </div>
     </>
   );
 }
@@ -249,7 +259,11 @@ export function MultiSelect({
             <div className="flex items-center justify-between border-t border-border px-3 py-2 text-xs text-muted">
               <span>{values.length} dipilih</span>
               {values.length > 0 ? (
-                <button type="button" className="font-medium text-accent hover:underline" onClick={() => onValuesChange([])}>
+                <button
+                  type="button"
+                  className="font-medium text-accent hover:underline"
+                  onClick={() => onValuesChange([])}
+                >
                   Kosongkan
                 </button>
               ) : null}

@@ -26,7 +26,9 @@ const duaDesimal = (n: number) => Math.abs(n * 100 - Math.round(n * 100)) < 1e-9
 /** Mencari sub-kriteria rentang yang memuat x. Batas bawah inklusif, batas atas inklusif (null = tak terbatas). */
 export function cariRentang(sub: readonly SubKriteriaKonversi[], x: number): SubKriteriaKonversi | null {
   return (
-    sub.find((s) => (s.batasBawah === null || x >= s.batasBawah) && (s.batasAtas === null || x <= s.batasAtas)) ?? null
+    sub.find(
+      (s) => (s.batasBawah === null || x >= s.batasBawah) && (s.batasAtas === null || x <= s.batasAtas),
+    ) ?? null
   );
 }
 
@@ -44,12 +46,14 @@ export function konversi(
     return { ok: true, nilai: s.nilai, nilaiMentah: null, subKriteriaId: s.id };
   }
   const x = input.mentah;
-  if (x === null || x === undefined || !Number.isFinite(x)) return { ok: false, pesan: `${k.kode}: nilai wajib angka` };
+  if (x === null || x === undefined || !Number.isFinite(x))
+    return { ok: false, pesan: `${k.kode}: nilai wajib angka` };
   if (!duaDesimal(x)) return { ok: false, pesan: `${k.kode}: maksimal 2 angka desimal` };
   if (k.nilaiMin !== null && x < k.nilaiMin) return { ok: false, pesan: `${k.kode}: minimal ${k.nilaiMin}` };
   if (k.nilaiMax !== null && x > k.nilaiMax) return { ok: false, pesan: `${k.kode}: maksimal ${k.nilaiMax}` };
   if (k.tipeInput === "ANGKA") {
-    if (k.jenis === "COST" && x <= 0) return { ok: false, pesan: `${k.kode}: kriteria cost harus lebih dari 0` };
+    if (k.jenis === "COST" && x <= 0)
+      return { ok: false, pesan: `${k.kode}: kriteria cost harus lebih dari 0` };
     return { ok: true, nilai: x, nilaiMentah: x, subKriteriaId: null };
   }
   if (x < 0) return { ok: false, pesan: `${k.kode}: tidak boleh negatif` };
@@ -69,9 +73,13 @@ function bersambung(atas: number, bawah: number): boolean {
 }
 
 /** Memeriksa rentang sub-kriteria: tidak tumpang tindih dan tidak berlubang (untuk nilai 2 desimal). */
-export function cekRentang(sub: readonly { label: string; batasBawah: number | null; batasAtas: number | null }[]): string[] {
+export function cekRentang(
+  sub: readonly { label: string; batasBawah: number | null; batasAtas: number | null }[],
+): string[] {
   const masalah: string[] = [];
-  const urut = [...sub].sort((a, b) => (a.batasBawah ?? Number.NEGATIVE_INFINITY) - (b.batasBawah ?? Number.NEGATIVE_INFINITY));
+  const urut = [...sub].sort(
+    (a, b) => (a.batasBawah ?? Number.NEGATIVE_INFINITY) - (b.batasBawah ?? Number.NEGATIVE_INFINITY),
+  );
   for (const s of urut) {
     if (s.batasBawah !== null && s.batasAtas !== null && s.batasAtas < s.batasBawah) {
       masalah.push(`${s.label}: batas atas lebih kecil dari batas bawah`);

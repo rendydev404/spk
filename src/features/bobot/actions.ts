@@ -31,23 +31,30 @@ export async function simpanBobot(periodeId: string, input: unknown): Promise<Ha
     const d = schema.parse(input);
     let baru: { id: string; bobot: number; kepentingan: number | null }[];
     if (d.mode === "KEPENTINGAN") {
-      if (d.items.some((i) => i.kepentingan === null)) throw new GalatBisnis("Semua kriteria wajib diberi tingkat kepentingan");
+      if (d.items.some((i) => i.kepentingan === null))
+        throw new GalatBisnis("Semua kriteria wajib diberi tingkat kepentingan");
       const persen = kepentinganKePersen(d.items.map((i) => i.kepentingan as number));
       baru = d.items.map((i, n) => ({ id: i.id, bobot: persen[n] as number, kepentingan: i.kepentingan }));
     } else {
       for (const i of d.items) {
-        if (i.bobot === null || i.bobot <= 0 || i.bobot > 100) throw new GalatBisnis("Setiap bobot harus antara 0,01 dan 100");
-        if (Math.abs(i.bobot * 100 - Math.round(i.bobot * 100)) > 1e-9) throw new GalatBisnis("Bobot maksimal 2 angka desimal");
+        if (i.bobot === null || i.bobot <= 0 || i.bobot > 100)
+          throw new GalatBisnis("Setiap bobot harus antara 0,01 dan 100");
+        if (Math.abs(i.bobot * 100 - Math.round(i.bobot * 100)) > 1e-9)
+          throw new GalatBisnis("Bobot maksimal 2 angka desimal");
       }
       baru = d.items.map((i) => ({ id: i.id, bobot: i.bobot as number, kepentingan: null }));
     }
     // Total dibandingkan dalam satuan sen (integer) agar bebas galat float.
     const totalSen = baru.reduce((s, b) => s + Math.round(b.bobot * 100), 0);
-    if (totalSen !== 10000) throw new GalatBisnis(`Total bobot ${(totalSen / 100).toFixed(2)}%, harus tepat 100%`);
+    if (totalSen !== 10000)
+      throw new GalatBisnis(`Total bobot ${(totalSen / 100).toFixed(2)}%, harus tepat 100%`);
 
     await db.transaction(async (tx) => {
       await kunciPeriode(tx, pid, ["DRAFT"]);
-      const lama = await tx.select({ id: kriteria.id, kode: kriteria.kode, bobot: kriteria.bobot }).from(kriteria).where(eq(kriteria.periodeId, pid));
+      const lama = await tx
+        .select({ id: kriteria.id, kode: kriteria.kode, bobot: kriteria.bobot })
+        .from(kriteria)
+        .where(eq(kriteria.periodeId, pid));
       if (lama.length !== baru.length || !baru.every((b) => lama.some((l) => l.id === b.id))) {
         throw new GalatBisnis("Daftar kriteria berubah. Muat ulang halaman lalu coba lagi.");
       }

@@ -40,7 +40,8 @@ export const auth = betterAuth({
     },
   },
   rateLimit: {
-    enabled: true,
+    // Aktif di production (5 percobaan login/menit). Di dev dimatikan agar tes E2E bisa login berulang.
+    enabled: process.env.NODE_ENV === "production",
     storage: "database",
     window: 60,
     max: 100,

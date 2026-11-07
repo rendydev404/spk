@@ -21,7 +21,15 @@ type Nilai = {
   nilaiMax: string | null;
 };
 
-export function KriteriaDialog({ periodeId, nilai, kodeBerikut }: { periodeId: string; nilai?: Nilai; kodeBerikut?: string }) {
+export function KriteriaDialog({
+  periodeId,
+  nilai,
+  kodeBerikut,
+}: {
+  periodeId: string;
+  nilai?: Nilai;
+  kodeBerikut?: string;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [tipe, setTipe] = useState<string>(nilai?.tipeInput ?? "ANGKA");
@@ -36,7 +44,11 @@ export function KriteriaDialog({ periodeId, nilai, kodeBerikut }: { periodeId: s
           <Plus className="size-4" aria-hidden /> Kriteria baru
         </Button>
       )}
-      <Dialog open={open} onOpenChange={setOpen} title={nilai ? `Ubah kriteria ${nilai.kode}` : "Kriteria baru"}>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title={nilai ? `Ubah kriteria ${nilai.kode}` : "Kriteria baru"}
+      >
         <FormAksi
           action={simpanKriteria.bind(null, periodeId, nilai?.id ?? null)}
           onOk={() => {
@@ -47,8 +59,20 @@ export function KriteriaDialog({ periodeId, nilai, kodeBerikut }: { periodeId: s
         >
           {({ pending, galat }) => (
             <>
-              <TextField label="Kode" name="kode" defaultValue={nilai?.kode ?? kodeBerikut} error={galat.kode} required />
-              <TextField label="Nama kriteria" name="nama" defaultValue={nilai?.nama} error={galat.nama} required />
+              <TextField
+                label="Kode"
+                name="kode"
+                defaultValue={nilai?.kode ?? kodeBerikut}
+                error={galat.kode}
+                required
+              />
+              <TextField
+                label="Nama kriteria"
+                name="nama"
+                defaultValue={nilai?.nama}
+                error={galat.nama}
+                required
+              />
               <div className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
                 <Select
                   label="Jenis"
@@ -70,8 +94,18 @@ export function KriteriaDialog({ periodeId, nilai, kodeBerikut }: { periodeId: s
                 />
                 {tipe !== "PILIHAN" ? (
                   <>
-                    <NumberField label="Nilai minimum" name="nilaiMin" defaultValue={nilai?.nilaiMin ?? "0"} error={galat.nilaiMin} />
-                    <NumberField label="Nilai maksimum" name="nilaiMax" defaultValue={nilai?.nilaiMax ?? "100"} error={galat.nilaiMax} />
+                    <NumberField
+                      label="Nilai minimum"
+                      name="nilaiMin"
+                      defaultValue={nilai?.nilaiMin ?? "0"}
+                      error={galat.nilaiMin}
+                    />
+                    <NumberField
+                      label="Nilai maksimum"
+                      name="nilaiMax"
+                      defaultValue={nilai?.nilaiMax ?? "100"}
+                      error={galat.nilaiMax}
+                    />
                   </>
                 ) : (
                   <>

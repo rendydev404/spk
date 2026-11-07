@@ -38,7 +38,10 @@ export function LoginForm({ tujuan }: { tujuan: string }) {
   return (
     <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4" noValidate>
       {error ? (
-        <div role="alert" className="flex gap-2 rounded-md border border-danger/30 bg-danger-soft px-3 py-2.5 text-[13px]">
+        <div
+          role="alert"
+          className="flex gap-2 rounded-md border border-danger/30 bg-danger-soft px-3 py-2.5 text-[13px]"
+        >
           <CircleAlert className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden />
           {error}
         </div>

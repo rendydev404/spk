@@ -21,7 +21,15 @@ const opsiSemester = [
   { value: "GENAP", label: "Genap" },
 ];
 
-function FieldUmum({ nilai, galat, identitasTerkunci }: { nilai?: Nilai; galat: Record<string, string>; identitasTerkunci?: boolean }) {
+function FieldUmum({
+  nilai,
+  galat,
+  identitasTerkunci,
+}: {
+  nilai?: Nilai;
+  galat: Record<string, string>;
+  identitasTerkunci?: boolean;
+}) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <TextField
@@ -104,7 +112,15 @@ export function BuatPeriodeForm({ periodeLain }: { periodeLain: { id: string; na
   );
 }
 
-export function UbahPeriodeForm({ id, nilai, identitasTerkunci }: { id: string; nilai: Nilai; identitasTerkunci: boolean }) {
+export function UbahPeriodeForm({
+  id,
+  nilai,
+  identitasTerkunci,
+}: {
+  id: string;
+  nilai: Nilai;
+  identitasTerkunci: boolean;
+}) {
   return (
     <FormAksi action={ubahPeriode.bind(null, id)} className="flex flex-col gap-4">
       {({ pending, galat }) => (

@@ -1,11 +1,5 @@
 import { SawValidationError } from "./errors.ts";
-import type {
-  AlternatifInput,
-  HasilAlternatif,
-  HasilKelompok,
-  HasilSaw,
-  KriteriaInput,
-} from "./types.ts";
+import type { AlternatifInput, HasilAlternatif, HasilKelompok, HasilSaw, KriteriaInput } from "./types.ts";
 
 export const TOLERANSI = 1e-9;
 
@@ -84,7 +78,9 @@ function hitungKelompok(
     return { id: a.id, nama: a.nama, kelompok: a.kelompok, normalisasi, terbobot, preferensi, peringkat: 0 };
   });
 
-  const mentahUtama = new Map(anggota.map((a) => [a.id, a.nilaiMentahUtama ?? a.nilai[kriteria[0]?.id ?? ""] ?? 0]));
+  const mentahUtama = new Map(
+    anggota.map((a) => [a.id, a.nilaiMentahUtama ?? a.nilai[kriteria[0]?.id ?? ""] ?? 0]),
+  );
   const kolator = new Intl.Collator("id", { sensitivity: "base" });
 
   // Urutan: V desc, lalu r kriteria berbobot terbesar, lalu nilai mentah C1, lalu nama A-Z.

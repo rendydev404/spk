@@ -27,7 +27,11 @@ export default async function PeriodePage() {
       />
       <div className="panel overflow-x-auto">
         {data.length === 0 ? (
-          <EmptyState icon={<CalendarRange />} title="Belum ada periode" description="Buat periode untuk mulai proses seleksi." />
+          <EmptyState
+            icon={<CalendarRange />}
+            title="Belum ada periode"
+            description="Buat periode untuk mulai proses seleksi."
+          />
         ) : (
           <table className="tabel">
             <thead>

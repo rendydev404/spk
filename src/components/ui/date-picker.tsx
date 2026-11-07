@@ -47,7 +47,12 @@ export function DatePicker({
   const [open, setOpen] = useState(false);
   const [salahKetik, setSalahKetik] = useState(false);
   return (
-    <Field label={label} htmlFor={id} error={error ?? (salahKetik ? "Format tanggal dd/mm/yyyy" : undefined)} hint={hint ?? "dd/mm/yyyy"}>
+    <Field
+      label={label}
+      htmlFor={id}
+      error={error ?? (salahKetik ? "Format tanggal dd/mm/yyyy" : undefined)}
+      hint={hint ?? "dd/mm/yyyy"}
+    >
       <RP.Root open={open} onOpenChange={setOpen}>
         <div className="relative">
           <input
@@ -80,7 +85,11 @@ export function DatePicker({
           </RP.Trigger>
         </div>
         <RP.Portal>
-          <RP.Content align="end" sideOffset={4} className="z-50 rounded-md border border-border bg-surface p-3 shadow-pop">
+          <RP.Content
+            align="end"
+            sideOffset={4}
+            className="z-50 rounded-md border border-border bg-surface p-3 shadow-pop"
+          >
             <DayPicker
               mode="single"
               locale={localeId}
@@ -129,7 +138,11 @@ export function DateRangePicker({
         <span className={cn(!value.dari && "text-muted")}>{teks}</span>
       </RP.Trigger>
       <RP.Portal>
-        <RP.Content align="start" sideOffset={4} className="z-50 rounded-md border border-border bg-surface p-3 shadow-pop">
+        <RP.Content
+          align="start"
+          sideOffset={4}
+          className="z-50 rounded-md border border-border bg-surface p-3 shadow-pop"
+        >
           <DayPicker
             mode="range"
             locale={localeId}

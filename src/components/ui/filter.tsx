@@ -19,6 +19,7 @@ function useSetParam() {
       else p.set(k, v);
     }
     p.delete("page");
+    p.delete("sebelum");
     const qs = p.toString();
     start(() => router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false }));
   };
@@ -26,7 +27,13 @@ function useSetParam() {
 }
 
 /** Kotak pencarian yang menyimpan kata kunci di URL (?q=), dengan debounce. */
-export function SearchBox({ placeholder = "Cari...", param = "q" }: { placeholder?: string; param?: string }) {
+export function SearchBox({
+  placeholder = "Cari...",
+  param = "q",
+}: {
+  placeholder?: string;
+  param?: string;
+}) {
   const { set, pending, sp } = useSetParam();
   const [v, setV] = useState(sp.get(param) ?? "");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -89,7 +96,10 @@ export function FilterSelect({
         aria-label={label}
         value={sp.get(param) ?? "__semua"}
         onValueChange={(v) => set({ [param]: v === "__semua" ? null : v })}
-        options={[{ value: "__semua", label: `${label}: ${semuaLabel}` }, ...options.map((o) => ({ ...o, label: `${label}: ${o.label}` }))]}
+        options={[
+          { value: "__semua", label: `${label}: ${semuaLabel}` },
+          ...options.map((o) => ({ ...o, label: `${label}: ${o.label}` })),
+        ]}
       />
     </div>
   );

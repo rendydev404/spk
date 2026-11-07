@@ -1,5 +1,6 @@
 import { UsersRound } from "lucide-react";
 import type { Metadata } from "next";
+import { z } from "zod";
 import { StatusBadge } from "@/components/layout/sidebar";
 import { TanpaPeriode } from "@/components/layout/tanpa-periode";
 import { FilterSelect } from "@/components/ui/filter";
@@ -10,15 +11,21 @@ import { calonAlternatif, daftarAlternatif, jumlahKriteria } from "@/features/al
 import { daftarKelas } from "@/features/kelas/queries";
 import { getPeriodeKerja } from "@/features/periode/kerja";
 import { requireUser } from "@/lib/rbac";
-import { z } from "zod";
 
 export const metadata: Metadata = { title: "Data alternatif" };
 
-export default async function AlternatifPage({ searchParams }: { searchParams: Promise<{ kelas?: string }> }) {
+export default async function AlternatifPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ kelas?: string }>;
+}) {
   const u = await requireUser();
   const { kerja } = await getPeriodeKerja();
   if (!kerja) return <TanpaPeriode />;
-  const kelasParam = z.string().uuid().safeParse((await searchParams).kelas);
+  const kelasParam = z
+    .string()
+    .uuid()
+    .safeParse((await searchParams).kelas);
   const admin = u.role === "ADMIN";
   const bisaTambah = admin && (kerja.status === "DRAFT" || kerja.status === "PENILAIAN");
   const [data, nKriteria, kelas, calon] = await Promise.all([
@@ -34,20 +41,31 @@ export default async function AlternatifPage({ searchParams }: { searchParams: P
         title="Data alternatif"
         description={
           <span className="inline-flex flex-wrap items-center gap-2">
-            Siswa yang diikutkan dalam perhitungan SPK periode {kerja.nama}. <StatusBadge status={kerja.status} />
+            Siswa yang diikutkan dalam perhitungan SPK periode {kerja.nama}.{" "}
+            <StatusBadge status={kerja.status} />
           </span>
         }
         actions={
           bisaTambah ? (
-            <TambahAlternatif periodeId={kerja.id} calon={calon} kelas={kelas} susulan={kerja.status !== "DRAFT"} />
+            <TambahAlternatif
+              periodeId={kerja.id}
+              calon={calon}
+              kelas={kelas}
+              susulan={kerja.status !== "DRAFT"}
+            />
           ) : null
         }
       />
       <div className="panel">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border p-3">
-          <FilterSelect param="kelas" label="Kelas" options={kelas.map((k) => ({ value: k.id, label: k.nama }))} />
+          <FilterSelect
+            param="kelas"
+            label="Kelas"
+            options={kelas.map((k) => ({ value: k.id, label: k.nama }))}
+          />
           <p className="text-[13px] text-muted">
-            {data.length} alternatif{bisaTambah && calon.length ? ` · ${calon.length} siswa belum diikutkan` : ""}
+            {data.length} alternatif
+            {bisaTambah && calon.length ? ` · ${calon.length} siswa belum diikutkan` : ""}
           </p>
         </div>
         {data.length === 0 ? (
@@ -57,7 +75,12 @@ export default async function AlternatifPage({ searchParams }: { searchParams: P
             description={admin ? "Tambahkan siswa yang akan diikutkan dalam seleksi." : undefined}
           />
         ) : (
-          <TabelAlternatif periodeId={kerja.id} data={data} jumlahKriteria={nKriteria} bisaHapus={admin && kerja.status === "DRAFT"} />
+          <TabelAlternatif
+            periodeId={kerja.id}
+            data={data}
+            jumlahKriteria={nKriteria}
+            bisaHapus={admin && kerja.status === "DRAFT"}
+          />
         )}
       </div>
     </>

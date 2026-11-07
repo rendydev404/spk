@@ -68,7 +68,15 @@ const PER_STATUS: Record<StatusPeriode, Aksi[]> = {
   ],
 };
 
-export function StatusAksi({ id, status, bisaHapus }: { id: string; status: StatusPeriode; bisaHapus: boolean }) {
+export function StatusAksi({
+  id,
+  status,
+  bisaHapus,
+}: {
+  id: string;
+  status: StatusPeriode;
+  bisaHapus: boolean;
+}) {
   const router = useRouter();
   const { jalan, pending } = useAksi();
   const [aktif, setAktif] = useState<Aksi | null>(null);
@@ -108,7 +116,13 @@ export function StatusAksi({ id, status, bisaHapus }: { id: string; status: Stat
         }
       >
         {aktif?.alasan ? (
-          <TextArea label="Alasan" value={alasan} onChange={(e) => setAlasan(e.target.value)} required hint="Minimal 10 karakter" />
+          <TextArea
+            label="Alasan"
+            value={alasan}
+            onChange={(e) => setAlasan(e.target.value)}
+            required
+            hint="Minimal 10 karakter"
+          />
         ) : null}
       </ConfirmDialog>
       <ConfirmDialog

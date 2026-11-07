@@ -58,7 +58,11 @@ export default async function KriteriaPage({ params }: { params: Promise<{ id: s
                 <th>Rentang nilai</th>
                 <th>Sub-kriteria</th>
                 <th className="num">Bobot</th>
-                {bisaUbah ? <th className="w-40"><span className="sr-only">Aksi</span></th> : null}
+                {bisaUbah ? (
+                  <th className="w-40">
+                    <span className="sr-only">Aksi</span>
+                  </th>
+                ) : null}
               </tr>
             </thead>
             <tbody>
@@ -66,14 +70,25 @@ export default async function KriteriaPage({ params }: { params: Promise<{ id: s
                 <tr key={k.id}>
                   <td className="font-semibold">{k.kode}</td>
                   <td>{k.nama}</td>
-                  <td>{k.jenis === "BENEFIT" ? <Badge tone="info">Benefit</Badge> : <Badge tone="warning">Cost</Badge>}</td>
+                  <td>
+                    {k.jenis === "BENEFIT" ? (
+                      <Badge tone="info">Benefit</Badge>
+                    ) : (
+                      <Badge tone="warning">Cost</Badge>
+                    )}
+                  </td>
                   <td>{LABEL_TIPE[k.tipeInput]}</td>
-                  <td className="tabular">{k.tipeInput === "PILIHAN" ? "-" : `${fmtAngka(k.nilaiMin)} - ${fmtAngka(k.nilaiMax)}`}</td>
+                  <td className="tabular">
+                    {k.tipeInput === "PILIHAN" ? "-" : `${fmtAngka(k.nilaiMin)} - ${fmtAngka(k.nilaiMax)}`}
+                  </td>
                   <td>
                     {k.tipeInput === "ANGKA" ? (
                       <span className="text-muted">Tidak dipakai</span>
                     ) : (
-                      <Link href={`/periode/${id}/kriteria/${k.id}`} className="font-medium text-accent hover:underline">
+                      <Link
+                        href={`/periode/${id}/kriteria/${k.id}`}
+                        className="font-medium text-accent hover:underline"
+                      >
                         {k.jumlahSub} sub-kriteria
                       </Link>
                     )}
@@ -84,9 +99,22 @@ export default async function KriteriaPage({ params }: { params: Promise<{ id: s
                       <div className="flex justify-end">
                         <KriteriaDialog
                           periodeId={id}
-                          nilai={{ id: k.id, kode: k.kode, nama: k.nama, jenis: k.jenis, tipeInput: k.tipeInput, nilaiMin: k.nilaiMin, nilaiMax: k.nilaiMax }}
+                          nilai={{
+                            id: k.id,
+                            kode: k.kode,
+                            nama: k.nama,
+                            jenis: k.jenis,
+                            tipeInput: k.tipeInput,
+                            nilaiMin: k.nilaiMin,
+                            nilaiMax: k.nilaiMax,
+                          }}
                         />
-                        <KriteriaBarisAksi id={k.id} kode={k.kode} pertama={i === 0} terakhir={i === data.length - 1} />
+                        <KriteriaBarisAksi
+                          id={k.id}
+                          kode={k.kode}
+                          pertama={i === 0}
+                          terakhir={i === data.length - 1}
+                        />
                       </div>
                     </td>
                   ) : null}

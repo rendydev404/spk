@@ -12,7 +12,14 @@ import { parseAngka } from "@/lib/format";
 import { kepentinganKePersen } from "@/lib/saw/engine";
 import { simpanBobot } from "../actions";
 
-type K = { id: string; kode: string; nama: string; jenis: "BENEFIT" | "COST"; bobot: string; kepentingan: number | null };
+type K = {
+  id: string;
+  kode: string;
+  nama: string;
+  jenis: "BENEFIT" | "COST";
+  bobot: string;
+  kepentingan: number | null;
+};
 type Mode = "PERSEN" | "KEPENTINGAN";
 
 const SKALA = [
@@ -25,7 +32,17 @@ const SKALA = [
 const KET_SKALA = ["", "Tidak penting", "Kurang penting", "Cukup penting", "Penting", "Sangat penting"];
 const fmt = new Intl.NumberFormat("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export function BobotEditor({ periodeId, kriteria, modeAwal, bisaUbah }: { periodeId: string; kriteria: K[]; modeAwal: Mode; bisaUbah: boolean }) {
+export function BobotEditor({
+  periodeId,
+  kriteria,
+  modeAwal,
+  bisaUbah,
+}: {
+  periodeId: string;
+  kriteria: K[];
+  modeAwal: Mode;
+  bisaUbah: boolean;
+}) {
   const router = useRouter();
   const { jalan, pending } = useAksi();
   const [mode, setMode] = useState<Mode>(modeAwal);
@@ -63,9 +80,15 @@ export function BobotEditor({ periodeId, kriteria, modeAwal, bisaUbah }: { perio
         />
         <div aria-live="polite" className="flex items-center gap-2 text-[13.5px]">
           <span className="text-muted">Total</span>
-          <span className={cn("text-lg font-semibold tabular", pas ? "text-success" : "text-warning")}>{fmt.format(totalSen / 100)}%</span>
+          <span className={cn("text-lg font-semibold tabular", pas ? "text-success" : "text-warning")}>
+            {fmt.format(totalSen / 100)}%
+          </span>
           <span className="text-muted">dari 100%</span>
-          {!pas ? <Badge tone="warning">{selisih > 0 ? `kurang ${fmt.format(selisih)}%` : `lebih ${fmt.format(-selisih)}%`}</Badge> : null}
+          {!pas ? (
+            <Badge tone="warning">
+              {selisih > 0 ? `kurang ${fmt.format(selisih)}%` : `lebih ${fmt.format(-selisih)}%`}
+            </Badge>
+          ) : null}
         </div>
       </div>
 
@@ -76,7 +99,9 @@ export function BobotEditor({ periodeId, kriteria, modeAwal, bisaUbah }: { perio
               <th className="w-16">Kode</th>
               <th>Kriteria</th>
               <th>Jenis</th>
-              <th className={mode === "KEPENTINGAN" ? "w-72" : "w-40"}>{mode === "KEPENTINGAN" ? "Tingkat kepentingan" : "Bobot (%)"}</th>
+              <th className={mode === "KEPENTINGAN" ? "w-72" : "w-40"}>
+                {mode === "KEPENTINGAN" ? "Tingkat kepentingan" : "Bobot (%)"}
+              </th>
               <th className="num w-28">Bobot akhir</th>
               <th className="num w-24">W (0-1)</th>
             </tr>
@@ -86,7 +111,13 @@ export function BobotEditor({ periodeId, kriteria, modeAwal, bisaUbah }: { perio
               <tr key={k.id}>
                 <td className="font-medium">{k.kode}</td>
                 <td>{k.nama}</td>
-                <td>{k.jenis === "BENEFIT" ? <Badge tone="info">Benefit</Badge> : <Badge tone="warning">Cost</Badge>}</td>
+                <td>
+                  {k.jenis === "BENEFIT" ? (
+                    <Badge tone="info">Benefit</Badge>
+                  ) : (
+                    <Badge tone="warning">Cost</Badge>
+                  )}
+                </td>
                 <td>
                   {mode === "KEPENTINGAN" ? (
                     <div className="flex items-center gap-2">
@@ -96,7 +127,9 @@ export function BobotEditor({ periodeId, kriteria, modeAwal, bisaUbah }: { perio
                         onValueChange={(v) => bisaUbah && setPenting((p) => ({ ...p, [k.id]: Number(v) }))}
                         options={SKALA}
                       />
-                      <span className="hidden text-xs text-muted xl:inline">{KET_SKALA[penting[k.id] ?? 3]}</span>
+                      <span className="hidden text-xs text-muted xl:inline">
+                        {KET_SKALA[penting[k.id] ?? 3]}
+                      </span>
                     </div>
                   ) : (
                     <input
@@ -119,8 +152,8 @@ export function BobotEditor({ periodeId, kriteria, modeAwal, bisaUbah }: { perio
 
       {mode === "KEPENTINGAN" ? (
         <p className="text-xs text-muted">
-          Bobot dihitung W<sub>j</sub> = k<sub>j</sub> / Σk, dibulatkan 2 desimal dengan sisa pembulatan diberikan ke kriteria berpecahan terbesar
-          sehingga total tepat 100%.
+          Bobot dihitung W<sub>j</sub> = k<sub>j</sub> / Σk, dibulatkan 2 desimal dengan sisa pembulatan
+          diberikan ke kriteria berpecahan terbesar sehingga total tepat 100%.
         </p>
       ) : null}
 

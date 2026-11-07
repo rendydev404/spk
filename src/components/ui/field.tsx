@@ -48,7 +48,16 @@ type TextFieldProps = Omit<ComponentProps<"input">, "type"> & {
   type?: "text" | "password" | "search" | "email";
 };
 
-export function TextField({ label, hint, error, id, className, required, type = "text", ...rest }: TextFieldProps) {
+export function TextField({
+  label,
+  hint,
+  error,
+  id,
+  className,
+  required,
+  type = "text",
+  ...rest
+}: TextFieldProps) {
   const gen = useId();
   const fid = id ?? gen;
   return (

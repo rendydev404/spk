@@ -1,4 +1,4 @@
-import { boolean, index, integer, pgEnum, pgTable, text, timestamp, bigint } from "drizzle-orm/pg-core";
+import { bigint, boolean, index, integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { citext } from "./types.ts";
 
 export const roleEnum = pgEnum("role", ["ADMIN", "WALI_KELAS", "KEPSEK"]);

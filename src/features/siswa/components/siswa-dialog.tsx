@@ -49,8 +49,22 @@ export function SiswaDialog({ nilai }: { nilai?: NilaiSiswa }) {
           {({ pending, galat }) => (
             <>
               <TextField label="NIS" name="nis" defaultValue={nilai?.nis} error={galat.nis} required />
-              <TextField label="NISN" name="nisn" defaultValue={nilai?.nisn ?? ""} inputMode="numeric" error={galat.nisn} hint="10 digit, opsional" />
-              <TextField label="Nama lengkap" name="nama" defaultValue={nilai?.nama} error={galat.nama} className="sm:col-span-2" required />
+              <TextField
+                label="NISN"
+                name="nisn"
+                defaultValue={nilai?.nisn ?? ""}
+                inputMode="numeric"
+                error={galat.nisn}
+                hint="10 digit, opsional"
+              />
+              <TextField
+                label="Nama lengkap"
+                name="nama"
+                defaultValue={nilai?.nama}
+                error={galat.nama}
+                className="sm:col-span-2"
+                required
+              />
               <Select
                 label="Jenis kelamin"
                 name="jenisKelamin"
@@ -62,7 +76,12 @@ export function SiswaDialog({ nilai }: { nilai?: NilaiSiswa }) {
                 error={galat.jenisKelamin}
                 required
               />
-              <DatePicker label="Tanggal lahir" name="tanggalLahir" defaultValue={nilai?.tanggalLahir ?? null} error={galat.tanggalLahir} />
+              <DatePicker
+                label="Tanggal lahir"
+                name="tanggalLahir"
+                defaultValue={nilai?.tanggalLahir ?? null}
+                error={galat.tanggalLahir}
+              />
               {nilai ? (
                 <div className="sm:col-span-2">
                   <Checkbox label="Siswa aktif" checked={aktif} onCheckedChange={setAktif} />

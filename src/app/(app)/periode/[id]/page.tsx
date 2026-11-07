@@ -2,15 +2,15 @@ import { CircleCheck, CircleDashed } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { StatusBadge } from "@/components/layout/sidebar";
 import { Alert, PageHeader } from "@/components/ui/misc";
-import { cekSyaratPenilaian } from "@/features/periode/guard";
-import { StatusAksi } from "@/features/periode/components/status-aksi";
 import { UbahPeriodeForm } from "@/features/periode/components/periode-form";
+import { StatusAksi } from "@/features/periode/components/status-aksi";
+import { cekSyaratPenilaian } from "@/features/periode/guard";
 import { getPeriode, ringkasPeriode } from "@/features/periode/queries";
 import { requireUser } from "@/lib/rbac";
 import { LABEL_STATUS, type StatusPeriode } from "@/lib/status";
-import { z } from "zod";
 
 export const metadata: Metadata = { title: "Detail periode" };
 
@@ -41,19 +41,35 @@ export default async function DetailPeriode({ params }: { params: Promise<{ id: 
       <PageHeader
         title={`Periode ${p.nama}`}
         description={<StatusBadge status={p.status} />}
-        actions={admin ? <StatusAksi id={p.id} status={p.status} bisaHapus={p.status === "DRAFT" && ringkas.jumlahNilai === 0} /> : null}
+        actions={
+          admin ? (
+            <StatusAksi
+              id={p.id}
+              status={p.status}
+              bisaHapus={p.status === "DRAFT" && ringkas.jumlahNilai === 0}
+            />
+          ) : null
+        }
       />
 
-      <ol className="panel mb-5 grid gap-px overflow-hidden bg-border sm:grid-cols-5" aria-label="Tahapan periode">
+      <ol
+        className="panel mb-5 grid gap-px overflow-hidden bg-border sm:grid-cols-5"
+        aria-label="Tahapan periode"
+      >
         {ALUR.map((s, i) => (
           <li key={s} className="bg-surface px-4 py-3" aria-current={i === idx ? "step" : undefined}>
             <div className="flex items-center gap-1.5 text-[13px] font-medium">
               {i < idx ? (
                 <CircleCheck className="size-4 text-success" aria-hidden />
               ) : (
-                <CircleDashed className={i === idx ? "size-4 text-accent" : "size-4 text-muted"} aria-hidden />
+                <CircleDashed
+                  className={i === idx ? "size-4 text-accent" : "size-4 text-muted"}
+                  aria-hidden
+                />
               )}
-              <span className={i === idx ? "text-accent" : i > idx ? "text-muted" : ""}>{LABEL_STATUS[s]}</span>
+              <span className={i === idx ? "text-accent" : i > idx ? "text-muted" : ""}>
+                {LABEL_STATUS[s]}
+              </span>
             </div>
             <p className="mt-0.5 text-xs text-muted">{KET[s]}</p>
           </li>
@@ -83,7 +99,12 @@ export default async function DetailPeriode({ params }: { params: Promise<{ id: 
             <UbahPeriodeForm
               id={p.id}
               identitasTerkunci={p.status !== "DRAFT"}
-              nilai={{ tahunAjaran: p.tahunAjaran, semester: p.semester, kuota: p.kuota, cakupanDefault: p.cakupanDefault }}
+              nilai={{
+                tahunAjaran: p.tahunAjaran,
+                semester: p.semester,
+                kuota: p.kuota,
+                cakupanDefault: p.cakupanDefault,
+              }}
             />
           ) : (
             <dl className="grid grid-cols-2 gap-3 text-[13.5px]">
@@ -114,7 +135,9 @@ export default async function DetailPeriode({ params }: { params: Promise<{ id: 
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-muted">Halaman kelas, alternatif, dan penilaian memakai periode kerja di sidebar.</p>
+          <p className="mt-3 text-xs text-muted">
+            Halaman kelas, alternatif, dan penilaian memakai periode kerja di sidebar.
+          </p>
         </aside>
       </div>
     </>

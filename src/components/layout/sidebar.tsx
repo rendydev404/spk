@@ -3,8 +3,8 @@
 import * as RD from "@radix-ui/react-dropdown-menu";
 import {
   BarChart3,
-  CalendarRange,
   Calculator,
+  CalendarRange,
   ClipboardList,
   FileText,
   History,
@@ -12,8 +12,8 @@ import {
   ListChecks,
   LogOut,
   Menu,
-  School,
   Scale,
+  School,
   Settings,
   ShieldCheck,
   UserCog,
@@ -25,13 +25,13 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { cn } from "@/components/ui/cn";
 import { Badge } from "@/components/ui/misc";
 import { Select } from "@/components/ui/select";
-import { cn } from "@/components/ui/cn";
 import { pilihPeriodeKerja } from "@/features/periode/kerja-actions";
 import { authClient } from "@/lib/auth-client";
-import { LABEL_ROLE, LABEL_STATUS, type StatusPeriode } from "@/lib/status";
 import type { Role } from "@/lib/rbac";
+import { LABEL_ROLE, LABEL_STATUS, type StatusPeriode } from "@/lib/status";
 import { type IkonNav, menu } from "./nav";
 
 const IKON: Record<IkonNav, typeof LayoutDashboard> = {
@@ -71,7 +71,13 @@ interface Props {
   namaSekolah: string;
 }
 
-function Isi({ pengguna, periode, periodeKerja, namaSekolah, onNavigate }: Props & { onNavigate?: () => void }) {
+function Isi({
+  pengguna,
+  periode,
+  periodeKerja,
+  namaSekolah,
+  onNavigate,
+}: Props & { onNavigate?: () => void }) {
   const pathname = usePathname();
   const [pending, start] = useTransition();
   const grup = menu(periodeKerja?.id ?? null)
@@ -82,7 +88,14 @@ function Isi({ pengguna, periode, periodeKerja, namaSekolah, onNavigate }: Props
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-4 pb-3 pt-4">
         <span className="grid size-8 shrink-0 place-items-center rounded-md bg-accent text-accent-fg">
-          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+          <svg
+            viewBox="0 0 24 24"
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            aria-hidden
+          >
             <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" strokeLinecap="round" />
           </svg>
         </span>
@@ -115,7 +128,9 @@ function Isi({ pengguna, periode, periodeKerja, namaSekolah, onNavigate }: Props
         {grup.map((g) => (
           <div key={g.judul || "utama"} className="mt-3 first:mt-1">
             {g.judul ? (
-              <p className="px-2.5 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted">{g.judul}</p>
+              <p className="px-2.5 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted">
+                {g.judul}
+              </p>
             ) : null}
             <ul>
               {g.items.map((i) => {
@@ -173,7 +188,10 @@ function MenuAkun({ pengguna }: { pengguna: Props["pengguna"] }) {
           className="z-50 min-w-52 rounded-md border border-border bg-surface p-1 shadow-pop"
         >
           <RD.Item asChild>
-            <Link href="/akun" className="flex h-8 items-center gap-2 rounded-sm px-2 text-[13px] outline-none data-[highlighted]:bg-surface-2">
+            <Link
+              href="/akun"
+              className="flex h-8 items-center gap-2 rounded-sm px-2 text-[13px] outline-none data-[highlighted]:bg-surface-2"
+            >
               <UserRound className="size-4 text-muted" aria-hidden /> Akun saya
             </Link>
           </RD.Item>
@@ -197,6 +215,8 @@ function MenuAkun({ pengguna }: { pengguna: Props["pengguna"] }) {
 export function Sidebar(props: Props) {
   const [buka, setBuka] = useState(false);
   const pathname = usePathname();
+  // Tutup drawer setiap kali halaman berpindah.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dipicu perubahan pathname
   useEffect(() => setBuka(false), [pathname]);
   return (
     <>
@@ -239,4 +259,3 @@ export function Sidebar(props: Props) {
     </>
   );
 }
-

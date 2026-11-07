@@ -44,7 +44,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div className="min-w-0 flex-1 text-[13px]">
               <p className="font-medium">{t.title}</p>
               {t.detail?.length ? (
-                <ul className={cn("mt-1 list-disc pl-4 text-muted", t.detail.length > 4 && "max-h-28 overflow-y-auto")}>
+                <ul
+                  className={cn(
+                    "mt-1 list-disc pl-4 text-muted",
+                    t.detail.length > 4 && "max-h-28 overflow-y-auto",
+                  )}
+                >
                   {t.detail.map((d) => (
                     <li key={d}>{d}</li>
                   ))}

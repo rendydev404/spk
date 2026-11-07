@@ -3,53 +3,53 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
-  --bg: #f6f6f4;
+  --bg: #f5f8fc;
   --surface: #ffffff;
-  --surface-2: #f0f0ed;
-  --border: #e2e2dd;
-  --border-strong: #cfcfc8;
-  --text: #1b1c1a;
-  --text-muted: #5f625b;
-  --accent: #1f5f4a;
-  --accent-hover: #184c3b;
-  --accent-soft: #e5efe9;
+  --surface-2: #eff3f9;
+  --border: #e1e7f0;
+  --border-strong: #c9d3e1;
+  --text: #0f172a;
+  --text-muted: #556178;
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-soft: #e6eefc;
   --accent-fg: #ffffff;
-  --success: #1e7a46;
-  --success-soft: #e3f3e8;
-  --warning: #9a5b00;
-  --warning-soft: #fbf0db;
-  --danger: #b42318;
-  --danger-soft: #fdeceb;
-  --info: #2457a6;
-  --info-soft: #e7eefb;
-  --focus-ring: #2f7d63;
-  --shadow-pop: 0 8px 24px rgb(20 20 18 / 0.12), 0 1px 3px rgb(20 20 18 / 0.08);
+  --success: #15803d;
+  --success-soft: #e3f4e8;
+  --warning: #a15c00;
+  --warning-soft: #fcf1dc;
+  --danger: #b91c1c;
+  --danger-soft: #fdecec;
+  --info: #0e7490;
+  --info-soft: #e2f4f8;
+  --focus-ring: #2563eb;
+  --shadow-pop: 0 8px 24px rgb(15 23 42 / 0.12), 0 1px 3px rgb(15 23 42 / 0.08);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121412;
-    --surface: #1a1c1a;
-    --surface-2: #222522;
-    --border: #2e322e;
-    --border-strong: #3c413c;
-    --text: #ecede9;
-    --text-muted: #a3a79f;
-    --accent: #5dbb94;
-    --accent-hover: #74c9a5;
-    --accent-soft: #1d3329;
-    --accent-fg: #0d1a14;
-    --success: #5cc488;
-    --success-soft: #19301f;
-    --warning: #e2a548;
-    --warning-soft: #33280f;
-    --danger: #f07a6d;
-    --danger-soft: #3a1b18;
-    --info: #7fa8ec;
-    --info-soft: #18243a;
-    --focus-ring: #74c9a5;
-    --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.45);
+    --bg: #0b1120;
+    --surface: #111a2e;
+    --surface-2: #17223a;
+    --border: #22304d;
+    --border-strong: #31416a;
+    --text: #e6ecf7;
+    --text-muted: #9aa8c3;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --accent-soft: #15284d;
+    --accent-fg: #0b1120;
+    --success: #4ade80;
+    --success-soft: #12301f;
+    --warning: #f2b04f;
+    --warning-soft: #33260f;
+    --danger: #f87171;
+    --danger-soft: #3a1717;
+    --info: #22d3ee;
+    --info-soft: #0f2d38;
+    --focus-ring: #60a5fa;
+    --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.5);
     color-scheme: dark;
   }
 }
@@ -272,5 +272,42 @@
   from {
     opacity: 0;
     transform: translateY(8px);
+  }
+}
+
+/* Laporan cetak */
+.cetak-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5pt;
+}
+.cetak-tabel th,
+.cetak-tabel td {
+  border: 1px solid #000;
+  padding: 3px 6px;
+  text-align: left;
+}
+.cetak-tabel th {
+  background: #eee;
+  font-weight: 600;
+}
+.cetak-tabel .r {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cetak-tabel tr {
+  break-inside: avoid;
+}
+.cetak-tabel thead {
+  display: table-header-group;
+}
+@page {
+  size: A4;
+  margin: 15mm 14mm;
+}
+@media print {
+  .cetak-tabel th {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

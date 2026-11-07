@@ -1,8 +1,8 @@
 import "server-only";
 import { unstable_rethrow } from "next/navigation";
 import { z } from "zod";
-import { SawValidationError } from "./saw";
 import { AksesDitolak } from "./rbac";
+import { SawValidationError } from "./saw";
 
 export type HasilAksi<T = undefined> =
   | { ok: true; pesan?: string; data?: T }
@@ -45,14 +45,18 @@ function pgError(e: unknown): { code: string; constraint?: string } | null {
 }
 
 /** Membungkus server action: validasi, error mapping, tanpa membocorkan detail internal. */
-export async function jalankan<T = undefined>(fn: () => Promise<HasilAksi<T> | undefined>): Promise<HasilAksi<T>> {
+export async function jalankan<T = undefined>(
+  fn: () => Promise<HasilAksi<T> | undefined>,
+): Promise<HasilAksi<T>> {
   try {
     return (await fn()) ?? { ok: true };
   } catch (e) {
     unstable_rethrow(e);
-    if (e instanceof GalatBisnis) return { ok: false, pesan: e.message, ...(e.masalah ? { masalah: e.masalah } : {}) };
+    if (e instanceof GalatBisnis)
+      return { ok: false, pesan: e.message, ...(e.masalah ? { masalah: e.masalah } : {}) };
     if (e instanceof AksesDitolak) return { ok: false, pesan: e.message };
-    if (e instanceof SawValidationError) return { ok: false, pesan: "Data belum siap dihitung", masalah: e.masalah };
+    if (e instanceof SawValidationError)
+      return { ok: false, pesan: "Data belum siap dihitung", masalah: e.masalah };
     if (e instanceof z.ZodError) {
       const galat: Record<string, string> = {};
       for (const i of e.issues) {
@@ -63,8 +67,11 @@ export async function jalankan<T = undefined>(fn: () => Promise<HasilAksi<T> | u
     }
     const pg = pgError(e);
     if (pg?.code === "23505" || pg?.code === "23503" || pg?.code === "23514") {
-      const pesan = (pg.constraint && PESAN_CONSTRAINT[pg.constraint]) ??
-        (pg.code === "23503" ? "Data masih dipakai oleh data lain sehingga tidak bisa dihapus" : "Data bentrok dengan data yang sudah ada");
+      const pesan =
+        (pg.constraint && PESAN_CONSTRAINT[pg.constraint]) ??
+        (pg.code === "23503"
+          ? "Data masih dipakai oleh data lain sehingga tidak bisa dihapus"
+          : "Data bentrok dengan data yang sudah ada");
       return { ok: false, pesan };
     }
     console.error("[aksi]", e);

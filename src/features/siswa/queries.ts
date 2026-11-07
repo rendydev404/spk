@@ -1,7 +1,7 @@
 import "server-only";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { hasil, kelas, kelasSiswa, periode, perhitungan, siswa } from "@/db/schema";
+import { hasil, kelas, kelasSiswa, perhitungan, periode, siswa } from "@/db/schema";
 
 export const PER_HALAMAN = 20;
 
@@ -14,8 +14,17 @@ export async function cariSiswa(o: {
 }) {
   const q = o.q?.trim();
   const syarat = and(
-    q ? or(ilike(siswa.nama, `%${q.replace(/[%_\\]/g, "\\$&")}%`), ilike(siswa.nis, `${q.replace(/[%_\\]/g, "\\$&")}%`)) : undefined,
-    o.status === "aktif" ? eq(siswa.aktif, true) : o.status === "nonaktif" ? eq(siswa.aktif, false) : undefined,
+    q
+      ? or(
+          ilike(siswa.nama, `%${q.replace(/[%_\\]/g, "\\$&")}%`),
+          ilike(siswa.nis, `${q.replace(/[%_\\]/g, "\\$&")}%`),
+        )
+      : undefined,
+    o.status === "aktif"
+      ? eq(siswa.aktif, true)
+      : o.status === "nonaktif"
+        ? eq(siswa.aktif, false)
+        : undefined,
     o.kelasId === "tanpa" ? sql`${kelas.id} is null` : o.kelasId ? eq(kelas.id, o.kelasId) : undefined,
   );
   const rows = await db
@@ -31,7 +40,10 @@ export async function cariSiswa(o: {
       total: sql<number>`count(*) over()::int`,
     })
     .from(siswa)
-    .leftJoin(kelasSiswa, and(eq(kelasSiswa.siswaId, siswa.id), eq(kelasSiswa.periodeId, o.periodeId ?? sql`null`)))
+    .leftJoin(
+      kelasSiswa,
+      and(eq(kelasSiswa.siswaId, siswa.id), eq(kelasSiswa.periodeId, o.periodeId ?? sql`null`)),
+    )
     .leftJoin(kelas, eq(kelas.id, kelasSiswa.kelasId))
     .where(syarat)
     .orderBy(asc(sql`lower(${siswa.nama})`), asc(siswa.nis))

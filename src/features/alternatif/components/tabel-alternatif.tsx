@@ -10,7 +10,14 @@ import { Badge } from "@/components/ui/misc";
 import { useAksi } from "@/components/ui/use-aksi";
 import { keluarkanAlternatif } from "../actions";
 
-type Baris = { siswaId: string; kode: string; nis: string; nama: string; kelasNama: string; jumlahNilai: number };
+type Baris = {
+  siswaId: string;
+  kode: string;
+  nis: string;
+  nama: string;
+  kelasNama: string;
+  jumlahNilai: number;
+};
 
 export function TabelAlternatif({
   periodeId,
@@ -27,7 +34,10 @@ export function TabelAlternatif({
   const { jalan, pending } = useAksi();
   const [pilih, setPilih] = useState<Set<string>>(new Set());
   const [konfirmasi, setKonfirmasi] = useState(false);
-  const nilaiHilang = useMemo(() => data.filter((d) => pilih.has(d.siswaId)).reduce((s, d) => s + d.jumlahNilai, 0), [data, pilih]);
+  const nilaiHilang = useMemo(
+    () => data.filter((d) => pilih.has(d.siswaId)).reduce((s, d) => s + d.jumlahNilai, 0),
+    [data, pilih],
+  );
   const semua = data.length > 0 && pilih.size === data.length;
 
   return (
