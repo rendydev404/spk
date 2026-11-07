@@ -1,0 +1,276 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --bg: #f6f6f4;
+  --surface: #ffffff;
+  --surface-2: #f0f0ed;
+  --border: #e2e2dd;
+  --border-strong: #cfcfc8;
+  --text: #1b1c1a;
+  --text-muted: #5f625b;
+  --accent: #1f5f4a;
+  --accent-hover: #184c3b;
+  --accent-soft: #e5efe9;
+  --accent-fg: #ffffff;
+  --success: #1e7a46;
+  --success-soft: #e3f3e8;
+  --warning: #9a5b00;
+  --warning-soft: #fbf0db;
+  --danger: #b42318;
+  --danger-soft: #fdeceb;
+  --info: #2457a6;
+  --info-soft: #e7eefb;
+  --focus-ring: #2f7d63;
+  --shadow-pop: 0 8px 24px rgb(20 20 18 / 0.12), 0 1px 3px rgb(20 20 18 / 0.08);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121412;
+    --surface: #1a1c1a;
+    --surface-2: #222522;
+    --border: #2e322e;
+    --border-strong: #3c413c;
+    --text: #ecede9;
+    --text-muted: #a3a79f;
+    --accent: #5dbb94;
+    --accent-hover: #74c9a5;
+    --accent-soft: #1d3329;
+    --accent-fg: #0d1a14;
+    --success: #5cc488;
+    --success-soft: #19301f;
+    --warning: #e2a548;
+    --warning-soft: #33280f;
+    --danger: #f07a6d;
+    --danger-soft: #3a1b18;
+    --info: #7fa8ec;
+    --info-soft: #18243a;
+    --focus-ring: #74c9a5;
+    --shadow-pop: 0 8px 24px rgb(0 0 0 / 0.45);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-fg: var(--accent-fg);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-focus: var(--focus-ring);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --shadow-pop: var(--shadow-pop);
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background: var(--bg);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+}
+
+@layer components {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tabel data */
+  .tabel {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13.5px;
+  }
+  .tabel th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .tabel td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .tabel tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .tabel tbody tr:hover td {
+    background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+  }
+  .tabel .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .kbd {
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0 4px;
+    color: var(--text-muted);
+  }
+}
+
+/* Kalender (react-day-picker) */
+.rdp-root {
+  --rdp-accent-color: var(--accent);
+  font-size: 13px;
+}
+.rdp-months {
+  position: relative;
+}
+.rdp-month_caption {
+  font-weight: 600;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+}
+.rdp-nav {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  gap: 2px;
+}
+.rdp-button_previous,
+.rdp-button_next {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: var(--text-muted);
+}
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background: var(--surface-2);
+}
+.rdp-chevron {
+  fill: currentColor;
+  width: 14px;
+  height: 14px;
+}
+.rdp-weekday {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  width: 34px;
+  height: 28px;
+}
+.rdp-day {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  text-align: center;
+}
+.rdp-day_button {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.rdp-day_button:hover {
+  background: var(--surface-2);
+}
+.rdp-today .rdp-day_button {
+  font-weight: 700;
+  color: var(--accent);
+}
+.rdp-selected .rdp-day_button,
+.rdp-range_start .rdp-day_button,
+.rdp-range_end .rdp-day_button {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+.rdp-range_middle {
+  background: var(--accent-soft);
+}
+.rdp-range_middle .rdp-day_button {
+  background: transparent;
+  color: var(--text);
+}
+.rdp-outside .rdp-day_button {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(0.98);
+  }
+}
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

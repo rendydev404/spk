@@ -1,0 +1,2062 @@
+{
+  "id": "48401d44-3ce9-4e23-bdfa-cea3d29e8f40",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.account": {
+      "name": "account",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "account_user_id_index": {
+          "name": "account_user_id_index",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
+          "tableFrom": "account",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rate_limit": {
+      "name": "rate_limit",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_request": {
+          "name": "last_request",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "rate_limit_key_unique": {
+          "name": "rate_limit_key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "session_user_id_index": {
+          "name": "session_user_id_index",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "session_token_unique": {
+          "name": "session_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "citext",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "username": {
+          "name": "username",
+          "type": "citext",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "display_username": {
+          "name": "display_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'WALI_KELAS'"
+        },
+        "aktif": {
+          "name": "aktif",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "wajib_ganti_password": {
+          "name": "wajib_ganti_password",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_email_unique": {
+          "name": "user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        },
+        "user_username_unique": {
+          "name": "user_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.verification": {
+      "name": "verification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "verification_identifier_index": {
+          "name": "verification_identifier_index",
+          "columns": [
+            {
+              "expression": "identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.alternatif": {
+      "name": "alternatif",
+      "schema": "",
+      "columns": {
+        "periode_id": {
+          "name": "periode_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "siswa_id": {
+          "name": "siswa_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kode": {
+          "name": "kode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ditambahkan_oleh": {
+          "name": "ditambahkan_oleh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "alternatif_siswa_id_index": {
+          "name": "alternatif_siswa_id_index",
+          "columns": [
+            {
+              "expression": "siswa_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "alternatif_periode_id_periode_id_fk": {
+          "name": "alternatif_periode_id_periode_id_fk",
+          "tableFrom": "alternatif",
+          "tableTo": "periode",
+          "columnsFrom": [
+            "periode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "alternatif_siswa_id_siswa_id_fk": {
+          "name": "alternatif_siswa_id_siswa_id_fk",
+          "tableFrom": "alternatif",
+          "tableTo": "siswa",
+          "columnsFrom": [
+            "siswa_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "alternatif_ditambahkan_oleh_user_id_fk": {
+          "name": "alternatif_ditambahkan_oleh_user_id_fk",
+          "tableFrom": "alternatif",
+          "tableTo": "user",
+          "columnsFrom": [
+            "ditambahkan_oleh"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "alternatif_terdaftar_di_kelas": {
+          "name": "alternatif_terdaftar_di_kelas",
+          "tableFrom": "alternatif",
+          "tableTo": "kelas_siswa",
+          "columnsFrom": [
+            "periode_id",
+            "siswa_id"
+          ],
+          "columnsTo": [
+            "periode_id",
+            "siswa_id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "alternatif_periode_id_siswa_id_pk": {
+          "name": "alternatif_periode_id_siswa_id_pk",
+          "columns": [
+            "periode_id",
+            "siswa_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "alternatif_kode_unik": {
+          "name": "alternatif_kode_unik",
+          "nullsNotDistinct": false,
+          "columns": [
+            "periode_id",
+            "kode"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.audit_log": {
+      "name": "audit_log",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "audit_log_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aksi": {
+          "name": "aksi",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entitas": {
+          "name": "entitas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entitas_id": {
+          "name": "entitas_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "audit_log_created_at_index": {
+          "name": "audit_log_created_at_index",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "audit_log_entitas_entitas_id_index": {
+          "name": "audit_log_entitas_entitas_id_index",
+          "columns": [
+            {
+              "expression": "entitas",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entitas_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "audit_log_user_id_index": {
+          "name": "audit_log_user_id_index",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "audit_log_user_id_user_id_fk": {
+          "name": "audit_log_user_id_user_id_fk",
+          "tableFrom": "audit_log",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hasil": {
+      "name": "hasil",
+      "schema": "",
+      "columns": {
+        "perhitungan_id": {
+          "name": "perhitungan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "siswa_id": {
+          "name": "siswa_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kelompok": {
+          "name": "kelompok",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kode_alternatif": {
+          "name": "kode_alternatif",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kelas_nama": {
+          "name": "kelas_nama",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_x": {
+          "name": "nilai_x",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalisasi": {
+          "name": "normalisasi",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_preferensi": {
+          "name": "nilai_preferensi",
+          "type": "numeric(10, 6)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "peringkat": {
+          "name": "peringkat",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "terpilih": {
+          "name": "terpilih",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "hasil_perhitungan_id_kelompok_peringkat_index": {
+          "name": "hasil_perhitungan_id_kelompok_peringkat_index",
+          "columns": [
+            {
+              "expression": "perhitungan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kelompok",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "peringkat",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "hasil_siswa_id_index": {
+          "name": "hasil_siswa_id_index",
+          "columns": [
+            {
+              "expression": "siswa_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "hasil_perhitungan_id_perhitungan_id_fk": {
+          "name": "hasil_perhitungan_id_perhitungan_id_fk",
+          "tableFrom": "hasil",
+          "tableTo": "perhitungan",
+          "columnsFrom": [
+            "perhitungan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "hasil_siswa_id_siswa_id_fk": {
+          "name": "hasil_siswa_id_siswa_id_fk",
+          "tableFrom": "hasil",
+          "tableTo": "siswa",
+          "columnsFrom": [
+            "siswa_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "hasil_perhitungan_id_siswa_id_pk": {
+          "name": "hasil_perhitungan_id_siswa_id_pk",
+          "columns": [
+            "perhitungan_id",
+            "siswa_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kelas": {
+      "name": "kelas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "periode_id": {
+          "name": "periode_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nama": {
+          "name": "nama",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tingkat": {
+          "name": "tingkat",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wali_kelas_id": {
+          "name": "wali_kelas_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "kelas_wali_kelas_id_periode_id_index": {
+          "name": "kelas_wali_kelas_id_periode_id_index",
+          "columns": [
+            {
+              "expression": "wali_kelas_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "periode_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kelas_periode_id_periode_id_fk": {
+          "name": "kelas_periode_id_periode_id_fk",
+          "tableFrom": "kelas",
+          "tableTo": "periode",
+          "columnsFrom": [
+            "periode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "kelas_wali_kelas_id_user_id_fk": {
+          "name": "kelas_wali_kelas_id_user_id_fk",
+          "tableFrom": "kelas",
+          "tableTo": "user",
+          "columnsFrom": [
+            "wali_kelas_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "kelas_periodeId_nama_unique": {
+          "name": "kelas_periodeId_nama_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "periode_id",
+            "nama"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "kelas_tingkat_valid": {
+          "name": "kelas_tingkat_valid",
+          "value": "\"kelas\".\"tingkat\" between 1 and 12"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.kelas_siswa": {
+      "name": "kelas_siswa",
+      "schema": "",
+      "columns": {
+        "kelas_id": {
+          "name": "kelas_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "siswa_id": {
+          "name": "siswa_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "periode_id": {
+          "name": "periode_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "kelas_siswa_siswa_id_index": {
+          "name": "kelas_siswa_siswa_id_index",
+          "columns": [
+            {
+              "expression": "siswa_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kelas_siswa_kelas_id_kelas_id_fk": {
+          "name": "kelas_siswa_kelas_id_kelas_id_fk",
+          "tableFrom": "kelas_siswa",
+          "tableTo": "kelas",
+          "columnsFrom": [
+            "kelas_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "kelas_siswa_siswa_id_siswa_id_fk": {
+          "name": "kelas_siswa_siswa_id_siswa_id_fk",
+          "tableFrom": "kelas_siswa",
+          "tableTo": "siswa",
+          "columnsFrom": [
+            "siswa_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "kelas_siswa_periode_id_periode_id_fk": {
+          "name": "kelas_siswa_periode_id_periode_id_fk",
+          "tableFrom": "kelas_siswa",
+          "tableTo": "periode",
+          "columnsFrom": [
+            "periode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "kelas_siswa_kelas_id_siswa_id_pk": {
+          "name": "kelas_siswa_kelas_id_siswa_id_pk",
+          "columns": [
+            "kelas_id",
+            "siswa_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "kelas_siswa_satu_kelas_per_periode": {
+          "name": "kelas_siswa_satu_kelas_per_periode",
+          "nullsNotDistinct": false,
+          "columns": [
+            "periode_id",
+            "siswa_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kriteria": {
+      "name": "kriteria",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "periode_id": {
+          "name": "periode_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kode": {
+          "name": "kode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nama": {
+          "name": "nama",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jenis": {
+          "name": "jenis",
+          "type": "jenis_kriteria",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bobot": {
+          "name": "bobot",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "kepentingan": {
+          "name": "kepentingan",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipe_input": {
+          "name": "tipe_input",
+          "type": "tipe_input",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_min": {
+          "name": "nilai_min",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nilai_max": {
+          "name": "nilai_max",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "urutan": {
+          "name": "urutan",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "kriteria_periode_id_periode_id_fk": {
+          "name": "kriteria_periode_id_periode_id_fk",
+          "tableFrom": "kriteria",
+          "tableTo": "periode",
+          "columnsFrom": [
+            "periode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "kriteria_periodeId_kode_unique": {
+          "name": "kriteria_periodeId_kode_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "periode_id",
+            "kode"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "kriteria_kode_format": {
+          "name": "kriteria_kode_format",
+          "value": "\"kriteria\".\"kode\" ~ '^C\\d+$'"
+        },
+        "kriteria_bobot_valid": {
+          "name": "kriteria_bobot_valid",
+          "value": "\"kriteria\".\"bobot\" >= 0 and \"kriteria\".\"bobot\" <= 100"
+        },
+        "kriteria_kepentingan_valid": {
+          "name": "kriteria_kepentingan_valid",
+          "value": "\"kriteria\".\"kepentingan\" is null or \"kriteria\".\"kepentingan\" between 1 and 5"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.pengaturan_sekolah": {
+      "name": "pengaturan_sekolah",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "smallint",
+          "primaryKey": true,
+          "notNull": true,
+          "default": 1
+        },
+        "nama_sekolah": {
+          "name": "nama_sekolah",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Nama Sekolah'"
+        },
+        "alamat": {
+          "name": "alamat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "kota": {
+          "name": "kota",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "logo_url": {
+          "name": "logo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nama_kepsek": {
+          "name": "nama_kepsek",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "nip_kepsek": {
+          "name": "nip_kepsek",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "pengaturan_satu_baris": {
+          "name": "pengaturan_satu_baris",
+          "value": "\"pengaturan_sekolah\".\"id\" = 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.penilaian": {
+      "name": "penilaian",
+      "schema": "",
+      "columns": {
+        "periode_id": {
+          "name": "periode_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "siswa_id": {
+          "name": "siswa_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kriteria_id": {
+          "name": "kriteria_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_mentah": {
+          "name": "nilai_mentah",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sub_kriteria_id": {
+          "name": "sub_kriteria_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nilai": {
+          "name": "nilai",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "diinput_oleh": {
+          "name": "diinput_oleh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "penilaian_periode_id_kriteria_id_index": {
+          "name": "penilaian_periode_id_kriteria_id_index",
+          "columns": [
+            {
+              "expression": "periode_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kriteria_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "penilaian_kriteria_id_kriteria_id_fk": {
+          "name": "penilaian_kriteria_id_kriteria_id_fk",
+          "tableFrom": "penilaian",
+          "tableTo": "kriteria",
+          "columnsFrom": [
+            "kriteria_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "penilaian_sub_kriteria_id_sub_kriteria_id_fk": {
+          "name": "penilaian_sub_kriteria_id_sub_kriteria_id_fk",
+          "tableFrom": "penilaian",
+          "tableTo": "sub_kriteria",
+          "columnsFrom": [
+            "sub_kriteria_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "penilaian_diinput_oleh_user_id_fk": {
+          "name": "penilaian_diinput_oleh_user_id_fk",
+          "tableFrom": "penilaian",
+          "tableTo": "user",
+          "columnsFrom": [
+            "diinput_oleh"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "penilaian_alternatif_fk": {
+          "name": "penilaian_alternatif_fk",
+          "tableFrom": "penilaian",
+          "tableTo": "alternatif",
+          "columnsFrom": [
+            "periode_id",
+            "siswa_id"
+          ],
+          "columnsTo": [
+            "periode_id",
+            "siswa_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "penilaian_periode_id_siswa_id_kriteria_id_pk": {
+          "name": "penilaian_periode_id_siswa_id_kriteria_id_pk",
+          "columns": [
+            "periode_id",
+            "siswa_id",
+            "kriteria_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.perhitungan": {
+      "name": "perhitungan",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "periode_id": {
+          "name": "periode_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cakupan": {
+          "name": "cakupan",
+          "type": "cakupan",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dihitung_oleh": {
+          "name": "dihitung_oleh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dihitung_pada": {
+          "name": "dihitung_pada",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status_perhitungan",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DRAFT'"
+        },
+        "jumlah_siswa": {
+          "name": "jumlah_siswa",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "perhitungan_periode_id_dihitung_pada_index": {
+          "name": "perhitungan_periode_id_dihitung_pada_index",
+          "columns": [
+            {
+              "expression": "periode_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dihitung_pada",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "perhitungan_satu_disetujui": {
+          "name": "perhitungan_satu_disetujui",
+          "columns": [
+            {
+              "expression": "periode_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"perhitungan\".\"status\" = 'DISETUJUI'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "perhitungan_periode_id_periode_id_fk": {
+          "name": "perhitungan_periode_id_periode_id_fk",
+          "tableFrom": "perhitungan",
+          "tableTo": "periode",
+          "columnsFrom": [
+            "periode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "perhitungan_dihitung_oleh_user_id_fk": {
+          "name": "perhitungan_dihitung_oleh_user_id_fk",
+          "tableFrom": "perhitungan",
+          "tableTo": "user",
+          "columnsFrom": [
+            "dihitung_oleh"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.periode": {
+      "name": "periode",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nama": {
+          "name": "nama",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tahun_ajaran": {
+          "name": "tahun_ajaran",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "semester": {
+          "name": "semester",
+          "type": "semester",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status_periode",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DRAFT'"
+        },
+        "cakupan_default": {
+          "name": "cakupan_default",
+          "type": "cakupan",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'SEKOLAH'"
+        },
+        "mode_bobot": {
+          "name": "mode_bobot",
+          "type": "mode_bobot",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PERSEN'"
+        },
+        "kuota": {
+          "name": "kuota",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "periode_satu_aktif": {
+          "name": "periode_satu_aktif",
+          "columns": [
+            {
+              "expression": "(true)",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"periode\".\"status\" in ('PENILAIAN','PERHITUNGAN','VALIDASI')",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "periode_tahunAjaran_semester_unique": {
+          "name": "periode_tahunAjaran_semester_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "tahun_ajaran",
+            "semester"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "periode_tahun_ajaran_format": {
+          "name": "periode_tahun_ajaran_format",
+          "value": "\"periode\".\"tahun_ajaran\" ~ '^\\d{4}/\\d{4}$'"
+        },
+        "periode_kuota_positif": {
+          "name": "periode_kuota_positif",
+          "value": "\"periode\".\"kuota\" is null or \"periode\".\"kuota\" >= 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.siswa": {
+      "name": "siswa",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nis": {
+          "name": "nis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nisn": {
+          "name": "nisn",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nama": {
+          "name": "nama",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jenis_kelamin": {
+          "name": "jenis_kelamin",
+          "type": "jenis_kelamin",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tanggal_lahir": {
+          "name": "tanggal_lahir",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aktif": {
+          "name": "aktif",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "siswa_nama_lower_idx": {
+          "name": "siswa_nama_lower_idx",
+          "columns": [
+            {
+              "expression": "lower(\"nama\") text_pattern_ops",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "siswa_nis_unique": {
+          "name": "siswa_nis_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nis"
+          ]
+        },
+        "siswa_nisn_unique": {
+          "name": "siswa_nisn_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nisn"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "siswa_nisn_format": {
+          "name": "siswa_nisn_format",
+          "value": "\"siswa\".\"nisn\" is null or \"siswa\".\"nisn\" ~ '^\\d{10}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.sub_kriteria": {
+      "name": "sub_kriteria",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "kriteria_id": {
+          "name": "kriteria_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai": {
+          "name": "nilai",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "batas_bawah": {
+          "name": "batas_bawah",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "batas_atas": {
+          "name": "batas_atas",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "urutan": {
+          "name": "urutan",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sub_kriteria_kriteria_id_kriteria_id_fk": {
+          "name": "sub_kriteria_kriteria_id_kriteria_id_fk",
+          "tableFrom": "sub_kriteria",
+          "tableTo": "kriteria",
+          "columnsFrom": [
+            "kriteria_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sub_kriteria_kriteriaId_label_unique": {
+          "name": "sub_kriteria_kriteriaId_label_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "kriteria_id",
+            "label"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "sub_kriteria_nilai_positif": {
+          "name": "sub_kriteria_nilai_positif",
+          "value": "\"sub_kriteria\".\"nilai\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.validasi": {
+      "name": "validasi",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "perhitungan_id": {
+          "name": "perhitungan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kepsek_id": {
+          "name": "kepsek_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "keputusan": {
+          "name": "keputusan",
+          "type": "keputusan",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "catatan": {
+          "name": "catatan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "validasi_perhitungan_id_index": {
+          "name": "validasi_perhitungan_id_index",
+          "columns": [
+            {
+              "expression": "perhitungan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "validasi_perhitungan_id_perhitungan_id_fk": {
+          "name": "validasi_perhitungan_id_perhitungan_id_fk",
+          "tableFrom": "validasi",
+          "tableTo": "perhitungan",
+          "columnsFrom": [
+            "perhitungan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "validasi_kepsek_id_user_id_fk": {
+          "name": "validasi_kepsek_id_user_id_fk",
+          "tableFrom": "validasi",
+          "tableTo": "user",
+          "columnsFrom": [
+            "kepsek_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "validasi_catatan_wajib_saat_tolak": {
+          "name": "validasi_catatan_wajib_saat_tolak",
+          "value": "\"validasi\".\"keputusan\" = 'DISETUJUI' or length(trim(coalesce(\"validasi\".\"catatan\", ''))) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.role": {
+      "name": "role",
+      "schema": "public",
+      "values": [
+        "ADMIN",
+        "WALI_KELAS",
+        "KEPSEK"
+      ]
+    },
+    "public.cakupan": {
+      "name": "cakupan",
+      "schema": "public",
+      "values": [
+        "SEKOLAH",
+        "TINGKAT",
+        "KELAS"
+      ]
+    },
+    "public.jenis_kelamin": {
+      "name": "jenis_kelamin",
+      "schema": "public",
+      "values": [
+        "L",
+        "P"
+      ]
+    },
+    "public.jenis_kriteria": {
+      "name": "jenis_kriteria",
+      "schema": "public",
+      "values": [
+        "BENEFIT",
+        "COST"
+      ]
+    },
+    "public.keputusan": {
+      "name": "keputusan",
+      "schema": "public",
+      "values": [
+        "DISETUJUI",
+        "DITOLAK"
+      ]
+    },
+    "public.mode_bobot": {
+      "name": "mode_bobot",
+      "schema": "public",
+      "values": [
+        "PERSEN",
+        "KEPENTINGAN"
+      ]
+    },
+    "public.semester": {
+      "name": "semester",
+      "schema": "public",
+      "values": [
+        "GANJIL",
+        "GENAP"
+      ]
+    },
+    "public.status_perhitungan": {
+      "name": "status_perhitungan",
+      "schema": "public",
+      "values": [
+        "DRAFT",
+        "DIAJUKAN",
+        "DISETUJUI",
+        "DITOLAK"
+      ]
+    },
+    "public.status_periode": {
+      "name": "status_periode",
+      "schema": "public",
+      "values": [
+        "DRAFT",
+        "PENILAIAN",
+        "PERHITUNGAN",
+        "VALIDASI",
+        "FINAL"
+      ]
+    },
+    "public.tipe_input": {
+      "name": "tipe_input",
+      "schema": "public",
+      "values": [
+        "ANGKA",
+        "RENTANG",
+        "PILIHAN"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

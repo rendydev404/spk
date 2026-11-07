@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: spk
+      POSTGRES_PASSWORD: spk
+      POSTGRES_DB: spk
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - spk-pg:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spk"]
+      interval: 5s
+      retries: 10
+volumes:
+  spk-pg:
