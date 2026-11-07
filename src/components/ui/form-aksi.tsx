@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useActionState, useEffect, useRef } from "react";
+import { type ReactNode, startTransition, useActionState, useEffect, useRef } from "react";
 import { useToast } from "./toast";
 
 type Hasil =
@@ -8,8 +8,9 @@ type Hasil =
   | { ok: false; pesan: string; galat?: Record<string, string>; masalah?: string[] };
 
 /**
- * Form yang memanggil server action (progressive enhancement), menampilkan notifikasi,
- * dan memberikan galat per field ke children.
+ * Form yang memanggil server action, menampilkan notifikasi, dan memberikan galat per field ke children.
+ * Dikirim lewat onSubmit (bukan prop `action`) karena React 19 mengosongkan form setelah action selesai;
+ * dengan cara ini isian pengguna tetap ada saat validasi gagal.
  */
 export function FormAksi({
   action,
@@ -37,7 +38,15 @@ export function FormAksi({
   }, [state, tampil, onOk]);
   const galat = state && !state.ok ? (state.galat ?? {}) : {};
   return (
-    <form action={formAction} className={className} noValidate>
+    <form
+      className={className}
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        startTransition(() => formAction(fd));
+      }}
+    >
       {children({ pending, galat })}
     </form>
   );

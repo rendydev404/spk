@@ -8,6 +8,7 @@ import { kelas } from "@/db/schema";
 import { GalatBisnis, type HasilAksi, jalankan } from "@/lib/aksi";
 import { bacaXlsx, PESAN_FILE } from "@/lib/excel";
 import { parseAngka } from "@/lib/format";
+import { konversi } from "@/lib/konversi";
 import { requireUser } from "@/lib/rbac";
 import { kriteriaLengkap } from "../kriteria/queries";
 import { dataGrid } from "./queries";
@@ -78,7 +79,23 @@ export async function imporNilai(kelasId: string, _: unknown, fd: FormData): Pro
           else entri.push({ siswaId, kriteriaId: kr.id, mentah: null, subKriteriaId: s.id, hapus: false });
         } else {
           const n = parseAngka(sel);
-          if (n === null) masalah.push(`Baris ${i + 2} ${kr.kode}: "${sel}" bukan angka`);
+          if (n === null) {
+            masalah.push(`Baris ${i + 2} ${kr.kode}: "${sel}" bukan angka`);
+            return;
+          }
+          // Cek batas dan rentang di sini juga, agar semua kesalahan file dilaporkan sekaligus.
+          const h = konversi(
+            {
+              kode: kr.kode,
+              tipeInput: kr.tipeInput,
+              jenis: kr.jenis,
+              nilaiMin: kr.nilaiMin === null ? null : Number(kr.nilaiMin),
+              nilaiMax: kr.nilaiMax === null ? null : Number(kr.nilaiMax),
+              sub: kr.sub,
+            },
+            { mentah: n },
+          );
+          if (!h.ok) masalah.push(`Baris ${i + 2} ${h.pesan}`);
           else entri.push({ siswaId, kriteriaId: kr.id, mentah: n, subKriteriaId: null, hapus: false });
         }
       });

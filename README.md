@@ -306,7 +306,7 @@ Radix UI, exceljs, Vitest, Playwright, Biome.
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | Biome |
 | `npm test` | Unit test (mesin SAW, konversi skala) |
-| `npm run test:e2e` | E2E Playwright (butuh server jalan di port 3100 dan `npm run db:seed` segar) |
+| `npm run test:e2e` | E2E Playwright di database `<nama>_e2e` dan server port 3200 terpisah (data utama aman; butuh `npm run build`) |
 | `npm run db:generate` | Buat file migrasi dari perubahan skema di `src/db/schema` |
 | `npm run db:migrate` | Terapkan migrasi |
 | `npm run db:seed` | Isi data demo (menghapus semua data) |

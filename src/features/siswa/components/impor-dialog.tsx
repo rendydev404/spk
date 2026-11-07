@@ -2,7 +2,7 @@
 
 import { CircleAlert, Download, FileUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { FileDrop } from "@/components/ui/file-drop";
@@ -70,7 +70,14 @@ export function ImporSiswaDialog() {
         }
       >
         {!baris ? (
-          <form action={action} className="flex flex-col gap-4">
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const fd = new FormData(e.currentTarget);
+              startTransition(() => action(fd));
+            }}
+          >
             <FileDrop name="file" />
             {state && !state.ok ? (
               <Alert tone="danger" icon={<CircleAlert />}>
