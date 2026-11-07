@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/db";
 import { account, pengaturanSekolah, user } from "@/db/schema";
-import { GalatBisnis, type HasilAksi, jalankan } from "@/lib/aksi";
+import { type HasilAksi, jalankan } from "@/lib/aksi";
 import { catatAudit } from "@/lib/audit";
 
 const schema = z
@@ -28,50 +28,58 @@ const schema = z
   })
   .refine((d) => d.password === d.ulang, { path: ["ulang"], message: "Konfirmasi password tidak sama" });
 
+class SudahDisiapkan extends Error {}
+
 /** Setup awal: hanya berjalan saat belum ada pengguna sama sekali. */
 export async function setupAwal(_: unknown, fd: FormData): Promise<HasilAksi> {
+  let sudah = false;
   const r = await jalankan(async () => {
     const d = schema.parse(Object.fromEntries(fd));
     const hash = await hashPassword(d.password);
-    await db.transaction(async (tx) => {
-      // Kunci agar dua permintaan setup bersamaan tidak sama-sama lolos.
-      await tx.execute(sql`select pg_advisory_xact_lock(424242)`);
-      const [ada] = await tx.select({ n: count() }).from(user);
-      if ((ada?.n ?? 0) > 0) throw new GalatBisnis("Aplikasi sudah disiapkan. Silakan masuk.");
-      const uid = crypto.randomUUID();
-      await tx.insert(user).values({
-        id: uid,
-        name: d.nama,
-        username: d.username,
-        displayUsername: d.username,
-        email: `${d.username}@spk.local`,
-        role: "ADMIN",
-      });
-      await tx
-        .insert(account)
-        .values({
+    try {
+      await db.transaction(async (tx) => {
+        // Kunci agar dua permintaan setup bersamaan tidak sama-sama lolos.
+        await tx.execute(sql`select pg_advisory_xact_lock(424242)`);
+        const [ada] = await tx.select({ n: count() }).from(user);
+        if ((ada?.n ?? 0) > 0) throw new SudahDisiapkan();
+        const uid = crypto.randomUUID();
+        await tx.insert(user).values({
+          id: uid,
+          name: d.nama,
+          username: d.username,
+          displayUsername: d.username,
+          email: `${d.username}@spk.local`,
+          role: "ADMIN",
+        });
+        await tx.insert(account).values({
           id: crypto.randomUUID(),
           accountId: uid,
           providerId: "credential",
           userId: uid,
           password: hash,
         });
-      const profil = {
-        namaSekolah: d.namaSekolah,
-        jenjang: d.jenjang,
-        kota: d.kota,
-        judulSeleksi: d.judulSeleksi,
-      };
-      await tx
-        .insert(pengaturanSekolah)
-        .values({ id: 1, ...profil })
-        .onConflictDoUpdate({ target: pengaturanSekolah.id, set: profil });
-      await catatAudit(
-        { userId: uid, aksi: "SETUP_AWAL", entitas: "pengaturan_sekolah", entitasId: "1", data: profil },
-        tx,
-      );
-    });
+        const profil = {
+          namaSekolah: d.namaSekolah,
+          jenjang: d.jenjang,
+          kota: d.kota,
+          judulSeleksi: d.judulSeleksi,
+        };
+        await tx
+          .insert(pengaturanSekolah)
+          .values({ id: 1, ...profil })
+          .onConflictDoUpdate({ target: pengaturanSekolah.id, set: profil });
+        await catatAudit(
+          { userId: uid, aksi: "SETUP_AWAL", entitas: "pengaturan_sekolah", entitasId: "1", data: profil },
+          tx,
+        );
+      });
+    } catch (e) {
+      // Sudah ada pengguna (misal setup dibuka di dua tab): arahkan ke login, bukan pesan galat.
+      if (!(e instanceof SudahDisiapkan)) throw e;
+      sudah = true;
+    }
   });
+  if (sudah) redirect("/login");
   if (r.ok) redirect("/login?setup=1");
   return r;
 }
